@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    >
+    
+    <FrameLayout
+        android:layout_width="800px"
+        android:layout_height="600px">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_ori"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="show"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:visibility="gone"
+            android:onClick="show"
+            android:id="@+id/iv_filter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </FrameLayout>
+
+
+</LinearLayout>
