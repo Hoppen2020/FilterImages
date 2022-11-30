@@ -22,7 +22,6 @@ public class FaceHydrationStatus extends FaceFilter{
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
                 Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -143,9 +142,6 @@ public class FaceHydrationStatus extends FaceFilter{
                 filterInfoResult.setFilterBitmap(resultBitmap);
                 filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat));
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        }catch (Exception e){
-            filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }
         return filterInfoResult;
     }
 

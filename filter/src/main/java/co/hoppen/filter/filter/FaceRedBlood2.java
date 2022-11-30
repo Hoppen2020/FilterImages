@@ -31,7 +31,6 @@ public class FaceRedBlood2 extends FaceFilter{
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
           Mat operateMat = new Mat();
           Utils.bitmapToMat(getOriginalImage(),operateMat);
 
@@ -68,9 +67,6 @@ public class FaceRedBlood2 extends FaceFilter{
 
           filterInfoResult.setFilterBitmap(resultBitmap);
           filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-
-      }
       return filterInfoResult;
    }
 

@@ -3,6 +3,8 @@ package co.hoppen.filter;
 import android.graphics.Bitmap;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.ThreadUtils;
 import com.huawei.hmf.tasks.OnFailureListener;
 import com.huawei.hmf.tasks.OnSuccessListener;
 import com.huawei.hms.mlsdk.MLAnalyzerFactory;
@@ -18,23 +20,16 @@ import java.util.List;
 
 import co.hoppen.filter.filter.FaceFilter;
 import co.hoppen.filter.filter.Filter;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * Created by YangJianHui on 2021/9/11.
  */
 public class FilterHelper {
-    private OnFilterListener onFilterListener;
     private MLFaceAnalyzer analyzer;
 
-    public FilterHelper(OnFilterListener onFilterListener){
-        setOnFilterListener(onFilterListener);
+    public FilterHelper(){
+        //每次创建 清除face缓存
+        SPUtils.getInstance().remove("face");
         if (!OpenCVLoader.initDebug()) {
             LogUtils.e("Internal OpenCV library not found. Using OpenCV Manager for initialization");
         } else {
@@ -49,12 +44,13 @@ public class FilterHelper {
      * @param bitmap 检测原图，
      * @param resistance 电阻值
      * @param dstFilterPath 输出滤镜地址
+     * @param onFilterListener 滤镜回调
      * @throws Exception
      */
-    public void execute(FilterType type, Bitmap bitmap , float resistance,String dstFilterPath)throws Exception{
+    public void execute(FilterType type, Bitmap bitmap , float resistance,String dstFilterPath,OnFilterListener onFilterListener)throws Exception{
         try {
 //            LogUtils.e(type);
-            executeResult(createFilter(type, bitmap, resistance,dstFilterPath));
+            executeResult(createFilter(type, bitmap, resistance,dstFilterPath),onFilterListener);
         } catch (Exception e) {
             LogUtils.e(e.toString());
             e.printStackTrace();
@@ -62,41 +58,30 @@ public class FilterHelper {
     }
 
     //异步执行算法
-    private void executeResult(Filter filter){
-        Observable.create(new ObservableOnSubscribe<FilterInfoResult>() {
-                    @Override
-                    public void subscribe(@NonNull ObservableEmitter<FilterInfoResult> emitter) throws Throwable {
-                        FilterInfoResult filterInfoResult = null;
-//                        LogUtils.e("executeResult   AAA");
-                        if (filter instanceof FaceFilter){
-                            //人脸算法
-//                            boolean finish = filter.facePositioning(createAnalyzer());
-//                            if (finish)filterInfoResult = filter.onFilter();
-                            boolean finish = ((FaceFilter) filter).faceAreaPositioning(createAnalyzer());
-//                            LogUtils.e("executeResult  "+finish);
-                            if (finish)filterInfoResult =  filter.onFilter();
-                        }else {
-                            //局部算法
-                            filterInfoResult = filter.onFilter();
-                        }
-                        filter.recycle();
-                        if (filterInfoResult!=null){
-                            emitter.onNext(filterInfoResult);
-                        }
-                    }
-                }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<FilterInfoResult>() {
-                    @Override
-                    public void accept(FilterInfoResult filterInfoResult) throws Throwable {
-                        onFilterListener.onFilter(filterInfoResult);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        LogUtils.e(throwable.toString());
-                    }
-                });
+    private void executeResult(Filter filter,OnFilterListener onFilterListener){
+        ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<FilterInfoResult>() {
+            @Override
+            public FilterInfoResult doInBackground() throws Throwable {
+                FilterInfoResult filterInfoResult = null;
+                if (filter instanceof FaceFilter){
+                    //人脸算法
+                    boolean finish = ((FaceFilter) filter).faceAreaPositioning(createAnalyzer());
+                    if (finish)filterInfoResult =  filter.onFilter();
+                }else {
+                    //局部算法
+                    filterInfoResult = filter.onFilter();
+                }
+                filter.recycle();
+                return filterInfoResult;
+            }
+
+            @Override
+            public void onSuccess(FilterInfoResult result) {
+                if (result!=null){
+                    onFilterListener.onFilter(result);
+                }
+            }
+        });
     }
 
     /**
@@ -199,14 +184,6 @@ public class FilterHelper {
                 if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();
             }
         });
-    }
-
-    /**
-     *  执行滤镜回调
-     * @param onFilterListener
-     */
-    public void setOnFilterListener(OnFilterListener onFilterListener) {
-        this.onFilterListener = onFilterListener;
     }
 
 }

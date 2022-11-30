@@ -30,7 +30,6 @@ public class FaceSuperficialPlaque extends FaceFilter {
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
          Mat operateMat = getPlSkin();
          //Utils.bitmapToMat(getOriginalImage(),operateMat);
          Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGB2HSV);
@@ -126,10 +125,7 @@ public class FaceSuperficialPlaque extends FaceFilter {
 
          filterInfoResult.setFilterBitmap(resultBitmap);
          filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-         LogUtils.e("156 // FaceSuperficialPlaque"+e.toString());
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
+
       return filterInfoResult;
    }
 

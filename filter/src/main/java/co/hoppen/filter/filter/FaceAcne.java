@@ -36,7 +36,6 @@ public class FaceAcne extends FaceFilter {
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
             Bitmap operateBitmap = getFaceAreaImage();
 
             Mat filterMat = new Mat();
@@ -93,10 +92,7 @@ public class FaceAcne extends FaceFilter {
             filterInfoResult.setFilterBitmap(operateBitmap);
             filterInfoResult.setDataTypeString(getFilterDataType(),areaPoints.size());
             filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-         LogUtils.e(e.toString());
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
+
       return filterInfoResult;
    }
 

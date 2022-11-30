@@ -27,7 +27,6 @@ public class FaceBrownArea2 extends FaceFilter{
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
          Mat operateMat = new Mat();
          Utils.bitmapToMat(getOriginalImage(),operateMat);
 
@@ -163,10 +162,7 @@ public class FaceBrownArea2 extends FaceFilter{
 
          filterInfoResult.setFilterBitmap(resultBitmap);
          filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-         LogUtils.e(e.toString());
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
+
       return filterInfoResult;
    }
 

@@ -20,7 +20,6 @@ public class FaceUvSpot extends FaceFilter{
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
          Bitmap operateBitmap = getOriginalImage();
          Mat operateMat = new Mat();
          Utils.bitmapToMat(operateBitmap,operateMat);
@@ -46,9 +45,7 @@ public class FaceUvSpot extends FaceFilter{
          filterInfoResult.setFilterBitmap(resultBitmap);
 
          filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
+
       return filterInfoResult;
    }
 

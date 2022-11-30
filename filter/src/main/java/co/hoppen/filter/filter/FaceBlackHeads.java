@@ -29,7 +29,6 @@ public class FaceBlackHeads extends FaceFilter {
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
           Bitmap originalImage = getOriginalImage();
           Bitmap createBitmap = getFaceAreaImage();
 
@@ -93,10 +92,7 @@ public class FaceBlackHeads extends FaceFilter {
           filterInfoResult.setFilterBitmap(createBitmap);
 
           filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-          LogUtils.e(e.toString());
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
+
       return filterInfoResult;
    }
 

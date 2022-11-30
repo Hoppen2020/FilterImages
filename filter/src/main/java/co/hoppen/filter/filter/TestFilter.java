@@ -14,8 +14,6 @@ public class TestFilter extends Filter{
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
-
             Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -60,10 +58,6 @@ public class TestFilter extends Filter{
 //                filterInfoResult.setRatio(0);
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        }catch (Exception e){
-
-        }
-
 
         return filterInfoResult;
     }

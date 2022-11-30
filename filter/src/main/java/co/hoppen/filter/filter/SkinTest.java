@@ -30,7 +30,6 @@ public class SkinTest extends Filter{
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
             Bitmap originalImage = getOriginalImage();
 
             Mat src = new Mat();
@@ -126,9 +125,6 @@ public class SkinTest extends Filter{
             Utils.matToBitmap(src,bitmap);
             filterInfoResult.setFilterBitmap(bitmap);
 
-        }catch (Exception e){
-            LogUtils.e(e.toString());
-        }
         return filterInfoResult;
     }
 

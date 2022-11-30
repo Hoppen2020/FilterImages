@@ -27,7 +27,6 @@ public class FaceNearRedLight extends FaceFilter{
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
             Mat operateMat = new Mat();
             Utils.bitmapToMat(getOriginalImage(),operateMat);
             Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGBA2RGB);
@@ -82,9 +81,7 @@ public class FaceNearRedLight extends FaceFilter{
             filterInfoResult.setFilterBitmap(resultBitmap);
 
             filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
+
       return filterInfoResult;
    }
 

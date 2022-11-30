@@ -24,7 +24,6 @@ public class FaceOilSecretion extends FaceFilter{
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
                 Bitmap originalImage = getOriginalImage();
                 Bitmap bitmap =  getFaceAreaImage();
                 Mat yuvMat = new Mat();
@@ -114,9 +113,6 @@ public class FaceOilSecretion extends FaceFilter{
                 }
                 filterInfoResult.setFilterBitmap(topBitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        }catch (Exception e){
-                filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }
         return filterInfoResult;
     }
 

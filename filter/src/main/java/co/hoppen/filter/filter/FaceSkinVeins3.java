@@ -24,7 +24,6 @@ public class FaceSkinVeins3 extends FaceFilter{
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
             Bitmap facePartBitmap = getFaceAreaImage();
                 Bitmap operateBitmap = facePartBitmap.copy(facePartBitmap.getConfig(),true);
 
@@ -132,10 +131,6 @@ public class FaceSkinVeins3 extends FaceFilter{
 
                 filterInfoResult.setFilterBitmap(result);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        } catch (Exception e) {
-            LogUtils.e(e.toString());
-            filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }
         return filterInfoResult;
     }
 

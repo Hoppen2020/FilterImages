@@ -16,7 +16,6 @@ public class FollicleCleanDegree extends Filter{
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
             Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -65,10 +64,6 @@ public class FollicleCleanDegree extends Filter{
                 }
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        }catch (Exception e){
-            LogUtils.e(e.getMessage());
-            filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }
         return filterInfoResult;
     }
 

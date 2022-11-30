@@ -10,7 +10,9 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgproc.CLAHE;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.LineSegmentDetector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,113 +22,90 @@ import co.hoppen.filter.FacePart;
 import co.hoppen.filter.FilterDataType;
 import co.hoppen.filter.FilterInfoResult;
 
+import static co.hoppen.filter.FacePart.FACE_FOREHEAD;
+import static co.hoppen.filter.FacePart.FACE_LEFT_RIGHT_AREA;
+import static org.opencv.imgproc.Imgproc.COLOR_RGB2GRAY;
+import static org.opencv.imgproc.Imgproc.COLOR_RGBA2RGB;
+import static org.opencv.imgproc.Imgproc.LSD_REFINE_ADV;
+import static org.opencv.imgproc.Imgproc.THRESH_BINARY_INV;
+
 /**
  * Created by YangJianHui on 2022/3/7.
  */
 public class FaceWrinkle extends FaceFilter {
 
-    private int w = 5;
-
-    private float sigma = 0.1f;
-
     @Override
     public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult =getFilterInfoResult();
-        try {
-            Bitmap originalImage = getOriginalImage();
-                Bitmap createBitmap = getFaceAreaImage();
+        FilterInfoResult filterInfoResult = getFilterInfoResult();
+        Mat operateMat = new Mat();
+        Utils.bitmapToMat(getOriginalImage(),operateMat);
+        Imgproc.cvtColor(operateMat,operateMat,COLOR_RGB2GRAY);
+        Imgproc.equalizeHist(operateMat,operateMat);
+        CLAHE clahe = Imgproc.createCLAHE(4.0d, new Size(8, 8));
+        clahe.apply(operateMat,operateMat);
 
-                Mat oriMat =new Mat();
-                Utils.bitmapToMat(createBitmap,oriMat);
+        Imgproc.adaptiveThreshold(operateMat,operateMat,255,Imgproc.ADAPTIVE_THRESH_MEAN_C,THRESH_BINARY_INV,9,8);
 
-                Mat filterMat = new Mat();
-                Utils.bitmapToMat(createBitmap,filterMat);
+        Mat fullFaceMat = new Mat();
+        Utils.bitmapToMat(getOriginalImage(),fullFaceMat);
+        Core.add(fullFaceMat,fullFaceMat,fullFaceMat,operateMat);
 
-                List<Mat> rgbList = new ArrayList<>();
+        Imgproc.cvtColor(fullFaceMat,fullFaceMat,COLOR_RGB2GRAY);
 
-                Core.split(filterMat,rgbList);
+        LineSegmentDetector lineSegmentDetector = Imgproc.createLineSegmentDetector(LSD_REFINE_ADV);
+        Mat lineMat = new Mat();
+        lineSegmentDetector.detect(fullFaceMat,lineMat);
 
-                Mat gMat = rgbList.get(1);
+        //LogUtils.e(fullFaceMat.toString(),lineMat.toString());
 
-                Imgproc.equalizeHist(gMat,filterMat);
+        Mat oriMat = new Mat();
+        Utils.bitmapToMat(getOriginalImage(),oriMat);
+        Imgproc.cvtColor(oriMat,oriMat,COLOR_RGBA2RGB);
 
-                Mat structuringElement = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(5, 5));
 
-                Imgproc.morphologyEx(filterMat,filterMat,Imgproc.MORPH_BLACKHAT,structuringElement);
+        lineSegmentDetector.drawSegments(oriMat,lineMat);
+//                Imgproc.cvtColor(oriMat,oriMat,COLOR_RGB2GRAY);
+        //Core.add(oriMat,oriMat,oriMat);
 
-                Core.inRange(filterMat,new Scalar(30,30,30),new Scalar(255,255,255),filterMat);
+        Bitmap allFaceBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(oriMat,allFaceBitmap);
 
-                Utils.matToBitmap(filterMat,createBitmap);
 
-                oriMat.release();
-                filterMat.release();
-                gMat.release();
-                structuringElement.release();
+        Bitmap faceAreaBitmap = getFaceAreaImage();
+        Bitmap originalImage = getOriginalImage();
 
-//                Bitmap resultBitmap = originalImage.copy(Bitmap.Config.ARGB_8888,true);
-//                Canvas canvas = new Canvas(resultBitmap);
-//                canvas.drawBitmap(createBitmap,0,0,null);
-//                if (!createBitmap.isRecycled())createBitmap.recycle();
+        int width = getOriginalImage().getWidth();
+        int height = getOriginalImage().getHeight();
+        int [] faceAreaPixels = new int[width * height];
+        int [] originalPixels = new int[width * height];
+        int [] allFacePixels = new int[width * height];
+        int [] operatePixels = new int[width * height];
 
-                int width = originalImage.getWidth();
-                int height = originalImage.getHeight();
-                int count = width * height;
-                int [] originalPixels = new int[count];
-                int [] filterPixels = new int[count];
-                int [] result = new int[count];
-                originalImage.getPixels(originalPixels,0,width,0,0,width,height);
-                createBitmap.getPixels(filterPixels,0,width,0,0,width,height);
+        faceAreaBitmap.getPixels(faceAreaPixels,0,width,0,0,width,height);
+        originalImage.getPixels(originalPixels,0,width,0,0,width,height);
+        allFaceBitmap.getPixels(allFacePixels,0,width,0,0,width,height);
 
-                for (int i = 0; i < filterPixels.length; i++) {
-                    if (filterPixels[i]==Color.BLACK){
-                        result[i] = originalPixels[i];
-                    }else {
-                        result[i] = Color.rgb(255,238,43);
-                    }
-                }
-                createBitmap = Bitmap.createBitmap(result,width,height, Bitmap.Config.ARGB_8888);
-
-                filterInfoResult.setFilterBitmap(createBitmap);
-                filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-
-        } catch (Exception e) {
-            LogUtils.e(e.toString());
-            filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
+        for (int i = 0; i < faceAreaPixels.length; i++) {
+            int oriPixel = faceAreaPixels[i];
+            operatePixels[i]= Color.alpha(oriPixel)==0?originalPixels[i]:allFacePixels[i];
         }
+        allFaceBitmap.setPixels(operatePixels,0,width, 0, 0, width, height);
+
+
+//        Bitmap allFaceBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(operateMat,allFaceBitmap);
+
+
+        filterInfoResult.setFilterBitmap(allFaceBitmap);
+        filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
+
         return filterInfoResult;
     }
 
-    private float [][] createKernel(){
-        //LogUtils.e((2 * w + 1) * (2 * w + 1),(2 * w + 1));
-        return new float[(2 * w + 1)][(2* w + 1)];
-    }
-
-    private void printlnArray(float[][] data){
-        for (int i = 0; i <data.length; i++) {
-            LogUtils.e(Arrays.toString(data[i]));
-        }
-    }
-
-    private float[] change(float[][] data){
-        List<Float> list = new ArrayList<>();
-        for (int i = 0; i < data.length; i++) {
-            float c [] =  data[i];
-            for (int j = 0; j < c.length; j++) {
-                float d =  c[j];
-                list.add(d);
-            }
-        }
-        float [] re = new float[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            re[i] = list.get(i);
-        }
-        LogUtils.e(Arrays.toString(re));
-        return re;
-    }
 
     @Override
     public FacePart[] getFacePart() {
-        return new FacePart[]{FacePart.FACE_FOREHEAD,FacePart.FACE_NOSE_LEFT_RIGHT,FacePart.FACE_EYE_BOTTOM};
+        return new FacePart[]{FACE_LEFT_RIGHT_AREA,FACE_FOREHEAD};
     }
 
     @Override

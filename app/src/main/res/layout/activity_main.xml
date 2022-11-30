@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
+    android:background="@color/black"
     >
     
     <FrameLayout
-        android:layout_width="800px"
-        android:layout_height="600px">
+        android:layout_width="1080px"
+        android:layout_height="1920px"
+        android:layout_gravity="center"
+        >
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_ori"
@@ -25,5 +27,4 @@
             android:layout_height="match_parent"/>
     </FrameLayout>
 
-
-</LinearLayout>
+</FrameLayout>

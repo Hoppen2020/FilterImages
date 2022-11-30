@@ -28,7 +28,6 @@ public class FaceFollicleCleanDegree extends FaceFilter {
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
             Bitmap originalImage = getOriginalImage();
             Bitmap createBitmap = getFaceAreaImage();
                     //originalImage.copy(Bitmap.Config.ARGB_8888,true);
@@ -95,10 +94,6 @@ public class FaceFollicleCleanDegree extends FaceFilter {
             filterInfoResult.setFilterBitmap(resultBitmap);
 
             filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      } catch (Exception e) {
-         LogUtils.e(e.toString());
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
       return filterInfoResult;
    }
 

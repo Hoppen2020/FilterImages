@@ -28,7 +28,6 @@ public class FaceEpidermisSpots extends FaceFilter {
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
                 Bitmap originalImage = getOriginalImage();
                 Bitmap cacheBitmap = getFaceAreaImage();
 
@@ -82,10 +81,6 @@ public class FaceEpidermisSpots extends FaceFilter {
                 filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(resultMat,1));
                 filterInfoResult.setDataTypeString(getFilterDataType(),count);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        } catch (Exception e) {
-            LogUtils.e(e.toString());
-            filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }
         return filterInfoResult;
     }
 

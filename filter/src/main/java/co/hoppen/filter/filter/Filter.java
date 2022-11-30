@@ -21,7 +21,7 @@ public abstract class Filter {
     }
 
     //算法逻辑
-    public abstract FilterInfoResult onFilter();
+    public abstract FilterInfoResult onFilter() throws Exception;
 
     public void createFilterResult(FilterType type,String filterImagePath) {
         filterInfoResult = new FilterInfoResult(type,filterImagePath);

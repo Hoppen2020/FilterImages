@@ -19,7 +19,9 @@ import co.hoppen.filter.filter.FaceSkinVeins3;
 import co.hoppen.filter.filter.FaceSuperficialPlaque;
 import co.hoppen.filter.filter.FaceTest;
 import co.hoppen.filter.filter.FaceUvSpot;
+import co.hoppen.filter.filter.FaceWrinkle;
 import co.hoppen.filter.filter.FaceWrinkle8;
+import co.hoppen.filter.filter.FaceWrinkle9;
 import co.hoppen.filter.filter.Filter;
 import co.hoppen.filter.filter.FollicleCleanDegree;
 import co.hoppen.filter.filter.SkinHydrationStatus;
@@ -52,7 +54,7 @@ public enum FilterType {
     FACE_OIL_SECRETION(FaceOilSecretion.class),
     //--------------皱纹---------------------
     //全脸——皱纹
-    FACE_WRINKLE(FaceWrinkle8.class),
+    FACE_WRINKLE(FaceWrinkle.class),
     //全脸——皮肤纹理
     FACE_SKIN_VEINS(FaceSkinVeins3.class),
     //--------------眼圈---------------------
@@ -86,7 +88,6 @@ public enum FilterType {
     FACE_BROWN_AREA(FaceBrownArea2.class),
     //紫外线斑
     FACE_UV_SPOT(FaceUvSpot.class),
-
 
     //全脸——测试
     FACE_TEST(FaceTest.class),

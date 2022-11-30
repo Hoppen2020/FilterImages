@@ -47,7 +47,5 @@ dependencies {
     implementation 'com.huawei.hms:ml-computer-vision-face-3d-model:3.5.0.302'
 
     implementation 'com.blankj:utilcodex:1.31.0'
-    implementation 'io.reactivex.rxjava3:rxjava:3.1.1'
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
 
 }

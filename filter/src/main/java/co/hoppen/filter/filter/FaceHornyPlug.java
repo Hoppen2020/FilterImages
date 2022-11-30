@@ -25,7 +25,6 @@ public class FaceHornyPlug extends FaceFilter {
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
          Bitmap operateBitmap = getFaceAreaImage();
          Mat operateMat = new Mat();
          Utils.bitmapToMat(operateBitmap,operateMat);
@@ -65,9 +64,6 @@ public class FaceHornyPlug extends FaceFilter {
          filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(hsvMat,39));
 
          filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
       return filterInfoResult;
    }
 

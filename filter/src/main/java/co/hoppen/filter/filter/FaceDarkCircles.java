@@ -23,7 +23,6 @@ public class FaceDarkCircles extends FaceFilter {
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-      try {
             Bitmap originalImage = getOriginalImage();
             Bitmap filterBitmap = getFaceAreaImage();
 
@@ -99,9 +98,6 @@ public class FaceDarkCircles extends FaceFilter {
 
             filterInfoResult.setFilterBitmap(filterBitmap);
             filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      }catch (Exception e){
-         filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-      }
       return filterInfoResult;
    }
 

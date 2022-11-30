@@ -3,9 +3,12 @@ package co.hoppen.filterimages;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
       setContentView(R.layout.activity_main);
       oriView = findViewById(R.id.iv_ori);
       filterView = findViewById(R.id.iv_filter);
-      Bitmap imageFromAssetsFile = getImageFromAssetsFile("f1.jpg");
+      Bitmap imageFromAssetsFile = getImageFromAssetsFile("111.jpg");
       oriView.setImageBitmap(imageFromAssetsFile);
 
       File file = new File(Environment.getExternalStorageDirectory().getPath() + "/test");
@@ -44,18 +47,19 @@ public class MainActivity extends AppCompatActivity {
          file.mkdirs();
       }
 
-      FilterHelper filterHelper = new FilterHelper(new OnFilterListener() {
-         @Override
-         public void onFilter(FilterInfoResult filterInfoResult) {
-            String filterImagePath = filterInfoResult.getFilterImagePath();
-            LogUtils.e(filterImagePath);
-            Bitmap bitmap = ImageUtils.getBitmap(filterImagePath);
-            if (bitmap!=null)filterView.setImageBitmap(bitmap);
-            filterView.setVisibility(View.VISIBLE);
-         }
-      });
+      FilterHelper filterHelper = new FilterHelper();
       try {
-         filterHelper.execute(FilterType.SKIN_TEST,imageFromAssetsFile,0,file.getPath()+"/3.jpg");
+         filterHelper.execute(FilterType.FACE_WRINKLE, imageFromAssetsFile, 0, file.getPath() + "/111.jpg", new OnFilterListener() {
+            @Override
+            public void onFilter(FilterInfoResult filterInfoResult) {
+               LogUtils.e(filterInfoResult.toString());
+               String filterImagePath = filterInfoResult.getFilterImagePath();
+               LogUtils.e(filterImagePath);
+               Bitmap bitmap = ImageUtils.getBitmap(filterImagePath);
+               if (bitmap!=null)filterView.setImageBitmap(bitmap);
+               filterView.setVisibility(View.VISIBLE);
+            }
+         });
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -79,5 +83,6 @@ public class MainActivity extends AppCompatActivity {
          filterView.setVisibility(View.VISIBLE);
       }else view.setVisibility(View.GONE);
    }
+
 
 }

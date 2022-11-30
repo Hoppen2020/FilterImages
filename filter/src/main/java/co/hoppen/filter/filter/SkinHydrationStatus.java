@@ -15,7 +15,6 @@ public class SkinHydrationStatus extends Filter {
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
             Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -112,9 +111,6 @@ public class SkinHydrationStatus extends Filter {
 //                filterInfoResult.setDepth(0);
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        }catch (Exception e){
-            filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }
         return filterInfoResult;
     }
 

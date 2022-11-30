@@ -23,7 +23,6 @@ public class SkinPigmentStatus extends Filter {
     @Override
     public FilterInfoResult onFilter() {
         FilterInfoResult filterInfoResult = getFilterInfoResult();
-        try {
             Bitmap originalImage = getOriginalImage();
 //            if (!isEmptyBitmap(originalImage)){
                 int width = originalImage.getWidth();
@@ -150,9 +149,6 @@ public class SkinPigmentStatus extends Filter {
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 //            }else filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }catch (Exception e){
-            filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        }
         return filterInfoResult;
     }
 
