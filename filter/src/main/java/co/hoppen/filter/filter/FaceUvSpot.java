@@ -20,31 +20,33 @@ public class FaceUvSpot extends FaceFilter{
    @Override
    public FilterInfoResult onFilter() {
       FilterInfoResult filterInfoResult = getFilterInfoResult();
-         Bitmap operateBitmap = getOriginalImage();
-         Mat operateMat = new Mat();
-         Utils.bitmapToMat(operateBitmap,operateMat);
+      Bitmap operateBitmap = getOriginalImage();
+      Mat operateMat = new Mat();
+      Utils.bitmapToMat(operateBitmap,operateMat);
 
-         Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGBA2GRAY);
+      Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGBA2GRAY);
 
-         CLAHE clahe = Imgproc.createCLAHE(3.0, new Size(8, 8));
+      CLAHE clahe = Imgproc.createCLAHE(3.0, new Size(8, 8));
 
-         clahe.apply(operateMat,operateMat);
+      clahe.apply(operateMat,operateMat);
 
-         Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
+      Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
 
-         Utils.matToBitmap(operateMat,resultBitmap);
+      operateMat = getFilterFaceMask(operateMat);
 
-         operateMat.release();
+      Utils.matToBitmap(operateMat,resultBitmap);
 
-         Mat areaMat = new Mat();
+      operateMat.release();
 
-         Utils.bitmapToMat(getFaceAreaImage(),areaMat);
+      Mat areaMat = new Mat();
 
-         filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat,1));
+      Utils.bitmapToMat(getFaceAreaImage(),areaMat);
 
-         filterInfoResult.setFilterBitmap(resultBitmap);
+      filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat,1));
 
-         filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
+      filterInfoResult.setFilterBitmap(resultBitmap);
+
+      filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 
       return filterInfoResult;
    }

@@ -24,76 +24,80 @@ import co.hoppen.filter.FilterInfoResult;
 
 public class FaceNearRedLight extends FaceFilter{
 
-   @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
-            Mat operateMat = new Mat();
-            Utils.bitmapToMat(getOriginalImage(),operateMat);
-            Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGBA2RGB);
-            Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGB2HSV);
+    @Override
+    public FilterInfoResult onFilter() {
+        FilterInfoResult filterInfoResult = getFilterInfoResult();
+        Mat operateMat = new Mat();
+        Utils.bitmapToMat(getOriginalImage(),operateMat);
+        Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGBA2RGB);
+        Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGB2HSV);
 
-            List<Mat> splitList = new ArrayList<>();
-            Core.split(operateMat,splitList);
-            splitList.set(0,new Mat(operateMat.size(), CvType.CV_8UC1,new Scalar(0)));
+        List<Mat> splitList = new ArrayList<>();
+        Core.split(operateMat,splitList);
+        splitList.set(0,new Mat(operateMat.size(), CvType.CV_8UC1,new Scalar(0)));
 
-            float percent = 0f;
+        float percent = 0f;
 
-            Mat matS = splitList.get(1);
+        Mat matS = splitList.get(1);
 
-            byte[] p = new byte[matS.channels() * matS.cols()];
+        byte[] p = new byte[matS.channels() * matS.cols()];
 
-            for (int h = 0; h < matS.rows(); h++) {
-               matS.get(h, 0, p);
-               for (int w = 0; w < matS.cols(); w++) {
-                  int index = matS.channels() * w;
-                  int value = p[index] & 0xff;
-                  percent = value / 255f + 0.1f;
-                  int nValue = (int) (value + percent * value);
-                  if (nValue>=255) {
-                     nValue = 255;
-                  }else if (nValue<=0){
-                     nValue = 0;
-                  }
-                  p[index] = (byte) nValue;
-               }
-               matS.put(h, 0, p);
+        for (int h = 0; h < matS.rows(); h++) {
+            matS.get(h, 0, p);
+            for (int w = 0; w < matS.cols(); w++) {
+                int index = matS.channels() * w;
+                int value = p[index] & 0xff;
+                percent = value / 255f + 0.1f;
+                int nValue = (int) (value + percent * value);
+                if (nValue>=255) {
+                    nValue = 255;
+                }else if (nValue<=0){
+                    nValue = 0;
+                }
+                p[index] = (byte) nValue;
             }
+            matS.put(h, 0, p);
+        }
 
-            Core.merge(splitList,operateMat);
-            Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_HSV2RGB);
+        Core.merge(splitList,operateMat);
+        Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_HSV2RGB);
 
-            double oriBrightness = Core.mean(operateMat).val[0];
+        double oriBrightness = Core.mean(operateMat).val[0];
 
-            double brightness = oriBrightness + (oriBrightness * 0.5d);
+        double brightness = oriBrightness + (oriBrightness * 0.5d);
 
-            LogUtils.e(oriBrightness,brightness);
+        //LogUtils.e(oriBrightness,brightness);
 
-            Core.add(operateMat,new Scalar(brightness - oriBrightness,brightness - oriBrightness,brightness - oriBrightness),operateMat);
-
-
-            Mat areaMat = new Mat();
-            Utils.bitmapToMat(getFaceAreaImage(),areaMat);
-            filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat,1));
+        Core.add(operateMat,new Scalar(brightness - oriBrightness,brightness - oriBrightness,brightness - oriBrightness),operateMat);
 
 
-            Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(operateMat,resultBitmap);
-            filterInfoResult.setFilterBitmap(resultBitmap);
+        Mat areaMat = new Mat();
+        Utils.bitmapToMat(getFaceAreaImage(),areaMat);
+        filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat,1));
 
-            filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 
-      return filterInfoResult;
-   }
+        Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
 
-   @Override
-   public FacePart[] getFacePart() {
-      return new FacePart[]{FacePart.FACE_SKIN};
-   }
+        operateMat = getFilterFaceMask(operateMat);
 
-   @Override
-   public FilterDataType getFilterDataType() {
-      return FilterDataType.AREA;
-   }
+        Utils.matToBitmap(operateMat,resultBitmap);
+        filterInfoResult.setFilterBitmap(resultBitmap);
+
+        filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
+
+        return filterInfoResult;
+    }
+
+    @Override
+    public FacePart[] getFacePart() {
+        return new FacePart[]{FacePart.FACE_SKIN};
+    }
+
+    @Override
+    public FilterDataType getFilterDataType() {
+        return FilterDataType.AREA;
+    }
 
 
 }
+
