@@ -25,8 +25,7 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceNearRedLight extends FaceFilter{
 
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
         Mat operateMat = new Mat();
         Utils.bitmapToMat(getOriginalImage(),operateMat);
         Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGBA2RGB);
@@ -66,10 +65,65 @@ public class FaceNearRedLight extends FaceFilter{
 
         double brightness = oriBrightness + (oriBrightness * 0.5d);
 
-        //LogUtils.e(oriBrightness,brightness);
+//        LogUtils.e(oriBrightness,brightness);
 
         Core.add(operateMat,new Scalar(brightness - oriBrightness,brightness - oriBrightness,brightness - oriBrightness),operateMat);
 
+
+        //RGB
+        byte[] rgbMat = new byte[operateMat.channels() * operateMat.cols()];
+
+        Mat faceMask = getFaceMask();
+        byte[] maskP = new byte[faceMask.channels() * faceMask.cols()];
+
+
+        float count = 0;
+        float totalCount = 0;
+
+        for (int h = 0; h < operateMat.rows(); h++) {
+            operateMat.get(h, 0, rgbMat);
+            faceMask.get(h,0,maskP);
+            for (int w = 0; w < operateMat.cols(); w++) {
+                int index = operateMat.channels() * w;
+                int maskGray = maskP[w] & 0xff;
+                if (maskGray!=0){
+                    int r = rgbMat[index] & 0xff;
+                    if (r<=110){
+                        //r值越小越红
+                        count++;
+                    }
+                    totalCount++;
+                }else {
+                    rgbMat[index] = 0;
+                    rgbMat[index + 1] = 0;
+                    rgbMat[index + 2] = 0;
+                }
+            }
+            operateMat.put(h, 0, rgbMat);
+        }
+        //32 89 84 86 95 84
+        LogUtils.e(count,totalCount,count * 100f / totalCount);
+        float score = 85f;
+        float areaPercent = count * 100f / totalCount;
+        //level1 10~20 level2 20~ 30 level3 30~40 level4 40~50
+        if (areaPercent<=20){
+            //70~85
+            score = ((1-(areaPercent / 20f)) * 15f)  + 70f;
+        }else if (areaPercent>20 && areaPercent<=30){
+            //60~70
+            score = ((1-((areaPercent - 20f) / 10f)) * 10f)  + 60f;
+        }else if (areaPercent>30 && areaPercent<=40){
+            //50~60
+            score = ((1-((areaPercent - 30f) / 10f)) * 10f)  + 50f;
+        }else if (areaPercent>40 && areaPercent<=50){
+            //30~50
+            score = ((1-((areaPercent - 40f) / 10f)) * 10f)  + 30f;
+        }else {
+            score = 20;
+        }
+        filterInfoResult.setScore((int) score);
+
+        filterInfoResult.setDataTypeString(getFilterDataType(),(double)areaPercent);
 
         Mat areaMat = new Mat();
         Utils.bitmapToMat(getFaceAreaImage(),areaMat);
@@ -78,14 +132,13 @@ public class FaceNearRedLight extends FaceFilter{
 
         Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
 
-        operateMat = getFilterFaceMask(operateMat);
+        //operateMat = getFilterFaceMask(operateMat);
 
         Utils.matToBitmap(operateMat,resultBitmap);
         filterInfoResult.setFilterBitmap(resultBitmap);
 
         filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 
-        return filterInfoResult;
     }
 
     @Override

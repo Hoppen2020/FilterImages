@@ -32,8 +32,7 @@ import static org.opencv.imgproc.Imgproc.THRESH_BINARY_INV;
 public class FaceWrinkle9 extends FaceFilter {
 
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
                 Mat operateMat = new Mat();
                 Utils.bitmapToMat(getOriginalImage(),operateMat);
                 Imgproc.cvtColor(operateMat,operateMat,COLOR_RGB2GRAY);
@@ -100,7 +99,6 @@ public class FaceWrinkle9 extends FaceFilter {
                 filterInfoResult.setFilterBitmap(allFaceBitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 
-        return filterInfoResult;
     }
 
 

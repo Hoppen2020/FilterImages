@@ -33,9 +33,13 @@ import static co.hoppen.filter.FacePart.FACE_LEFT_RIGHT_AREA;
  */
 public class FaceAcne extends FaceFilter {
 
-   @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+    /**
+     *
+     * 5↓——level1 5-20——level2 20-30——level3 30↑——level4
+     */
+
+    @Override
+   public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap operateBitmap = getFaceAreaImage();
 
             Mat filterMat = new Mat();
@@ -83,6 +87,30 @@ public class FaceAcne extends FaceFilter {
               matOfPoint.fromList(areaPoints);
               filterInfoResult.setFaceAreaInfo(createFaceAreaInfoByPoints(matOfPoint,operateBitmap.getWidth(),operateBitmap.getHeight()));
           }
+
+          //5↓——level1 5-20——level2 20-30——level3 30↑——level4
+          float score = 85;
+          int count = areaPoints.size();
+          if (count<=5){
+              score = ((1 - (count / 5)) * 15) + 70f;
+          }else if (count>5&&count<=20){
+              score = ((1 - ((count-5) / 15f)) * 10) + 60f;
+          }else if (count>20&&count<=30){
+              score = ((1 - ((count-20) / 10f)) * 10) + 50f;
+          }else if (count>30){
+              if (count>30 && count<=60){
+                  score =  ((1-((count - 30) /30f)) * 10) + 40;
+              }else if (count>60 && count<=80){
+                  score =  ((1-((count - 60) /20f)) * 10) + 30;
+              }else if (count>80 && count<=100){
+                  score =  ((1-((count - 80) /20f)) * 10) + 20;
+              }else {
+                  score = 20;
+              }
+          }
+          filterInfoResult.setScore((int) score);
+
+
           Utils.matToBitmap(dst,operateBitmap);
 
             filterMat.release();
@@ -90,10 +118,8 @@ public class FaceAcne extends FaceFilter {
             dst.release();
             //areaMat.release();
             filterInfoResult.setFilterBitmap(operateBitmap);
-            filterInfoResult.setDataTypeString(getFilterDataType(),areaPoints.size());
+            filterInfoResult.setDataTypeString(getFilterDataType(),count);
             filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-
-      return filterInfoResult;
    }
 
    private Mat getFaceSkinByRgb(){

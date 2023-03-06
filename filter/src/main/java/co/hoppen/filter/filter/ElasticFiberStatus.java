@@ -15,8 +15,7 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class ElasticFiberStatus extends Filter{
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -134,12 +133,10 @@ public class ElasticFiberStatus extends Filter{
 
                 Bitmap bitmap = Bitmap.createBitmap(width, height,Bitmap.Config.ARGB_8888);
                 bitmap.setPixels(filterPixels,0,width, 0, 0, width, height);
-                filterInfoResult.setResistance(getResistance());
                 filterInfoResult.setScore(score);
 //                filterInfoResult.setRatio((countRgb * 100 / count));
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        return filterInfoResult;
     }
 
 

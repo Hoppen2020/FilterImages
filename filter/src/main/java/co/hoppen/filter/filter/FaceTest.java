@@ -25,8 +25,7 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceTest extends FaceFilter{
 
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
       Bitmap originalImage = getOriginalImage();
       Bitmap cacheBitmap = getOriginalImage();
 //
@@ -79,7 +78,6 @@ public class FaceTest extends FaceFilter{
       //filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(resultMat,1));
       filterInfoResult.setDataTypeString(getFilterDataType(),0);
       filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      return filterInfoResult;
    }
 
 

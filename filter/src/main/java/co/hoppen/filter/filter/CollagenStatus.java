@@ -12,8 +12,7 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class CollagenStatus extends Filter{
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -36,11 +35,9 @@ public class CollagenStatus extends Filter{
                 if (score > 72) {
                     score = 72 - random.nextInt(4);
                 }
-
-                filterInfoResult.setResistance(getResistance());
                 filterInfoResult.setScore(score);
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        return filterInfoResult;
     }
+
 }

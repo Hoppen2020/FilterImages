@@ -104,11 +104,12 @@ public class CutoutUtils {
                 pathLineTo(path,mlPosition);
             }
         }
-        path.close();
-        paint.setColor(Color.WHITE);
-        paint.setStyle(Paint.Style.STROKE);
-//        paint.setStrokeWidth(5f);
-        canvas.drawPath(path,paint);
+        if (path!=null){
+            path.close();
+            paint.setColor(Color.WHITE);
+            paint.setStyle(Paint.Style.STROKE);
+            canvas.drawPath(path,paint);
+        }
     }
 
     private static Path pathMoveTo(MLPosition mlPosition){

@@ -73,7 +73,7 @@ public enum FilterType {
     //全脸——卟啉（伍氏）
     FACE_PORPHYRIN(FacePorphyrin.class),
     //--------------敏感---------------------
-    //全脸——红血丝(交叉PL)
+    //全脸——红血丝(交叉PL)×分数
     FACE_RED_BLOOD(FaceRedBlood2.class),
     //全脸——敏感(交叉PL)
     FACE_NEAR_RED_LIGHT(FaceNearRedLight.class),

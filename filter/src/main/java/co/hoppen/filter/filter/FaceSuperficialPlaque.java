@@ -20,6 +20,7 @@ import java.util.List;
 import co.hoppen.filter.FacePart;
 import co.hoppen.filter.FilterDataType;
 import co.hoppen.filter.FilterInfoResult;
+import co.hoppen.filter.utils.FaceSkinUtils;
 
 /**
  * 色素沉着
@@ -28,8 +29,7 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceSuperficialPlaque extends FaceFilter {
 
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
          Mat operateMat = getPlSkin();
          //Utils.bitmapToMat(getOriginalImage(),operateMat);
          Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGB2HSV);
@@ -91,6 +91,8 @@ public class FaceSuperficialPlaque extends FaceFilter {
 
          Mat mask = new Mat(operateMat.size(),CvType.CV_8UC1);
 
+         float count = 0;
+
          for (int h = 0; h < operateMat.rows(); h++) {
             operateMat.get(h,0,p);
             for (int w = 0; w < operateMat.cols(); w++) {
@@ -102,6 +104,7 @@ public class FaceSuperficialPlaque extends FaceFilter {
                   value = mix>255?255:mix<0?0:(int)mix;
                   if (value<=(min + max) / 2){
                      value = Color.WHITE;
+                      count++;
                   }else value = Color.BLACK;
                }else {
                   value = Color.BLACK;
@@ -110,6 +113,36 @@ public class FaceSuperficialPlaque extends FaceFilter {
             }
             mask.put(h,0,p);
          }
+
+
+         //0.542 0.48  0.5  0.51 0.51
+         //LogUtils.e(count, FaceSkinUtils.getSkinArea(),count / FaceSkinUtils.getSkinArea());
+
+       float score = 85;
+       float areaPercent = FaceSkinUtils.getSkinArea()>count?count * 100f /FaceSkinUtils.getSkinArea():100f;
+       //level1——25~40 level2——40~50 level3——50~60 level4——60~100
+
+       if (areaPercent<=25){
+           score = 85f;
+       }else if (areaPercent>25 && areaPercent<=40){
+           //70~85
+           score = ((1 - ((areaPercent-25) / 15f)) * 15f) + 70f;
+       }else if (areaPercent>40 && areaPercent<=50){
+           //60~70
+           score = ((1 - ((areaPercent-40) / 10f)) * 10) + 60f;
+       }else if (areaPercent>50 && areaPercent<=60){
+           //50~60
+           score = ((1 - ((areaPercent-50) / 10f)) * 10) + 50f;
+       }else if (areaPercent>60 && areaPercent<=90){
+           //40~50
+           score = ((1 - ((areaPercent-60) / 30f)) * 10) + 40f;
+       }else {
+           score = 20f;
+       }
+
+       filterInfoResult.setScore((int) score);
+       filterInfoResult.setDataTypeString(getFilterDataType(),(double)areaPercent);
+
 
          Utils.bitmapToMat(getOriginalImage(),operateMat);
 
@@ -126,7 +159,6 @@ public class FaceSuperficialPlaque extends FaceFilter {
          filterInfoResult.setFilterBitmap(resultBitmap);
          filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 
-      return filterInfoResult;
    }
 
    private Mat getPlSkin(){
@@ -165,7 +197,7 @@ public class FaceSuperficialPlaque extends FaceFilter {
 
    @Override
    public FilterDataType getFilterDataType() {
-      return FilterDataType.COUNT;
+      return FilterDataType.AREA;
    }
 
 }

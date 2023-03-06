@@ -26,8 +26,7 @@ public class FaceRedBlood extends FaceFilter{
 
    @RequiresApi(api = Build.VERSION_CODES.N)
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
       try {
           Mat operateMat = new Mat();
           Utils.bitmapToMat(getOriginalImage(),operateMat);
@@ -88,9 +87,7 @@ public class FaceRedBlood extends FaceFilter{
           filterInfoResult.setFilterBitmap(resultBitmap);
           filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
       }catch (Exception e){
-
       }
-      return filterInfoResult;
    }
 
    @Override

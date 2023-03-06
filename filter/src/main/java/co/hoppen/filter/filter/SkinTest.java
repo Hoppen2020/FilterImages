@@ -28,8 +28,7 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class SkinTest extends Filter{
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap originalImage = getOriginalImage();
 
             Mat src = new Mat();
@@ -125,7 +124,6 @@ public class SkinTest extends Filter{
             Utils.matToBitmap(src,bitmap);
             filterInfoResult.setFilterBitmap(bitmap);
 
-        return filterInfoResult;
     }
 
     private void draw(Mat src,Mat mask,Scalar scalar){

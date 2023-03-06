@@ -21,8 +21,7 @@ public class SkinPigmentStatus extends Filter {
     public static int Gray = 177;//177    245
 
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap originalImage = getOriginalImage();
 //            if (!isEmptyBitmap(originalImage)){
                 int width = originalImage.getWidth();
@@ -140,7 +139,6 @@ public class SkinPigmentStatus extends Filter {
 
                 Bitmap bitmap = Bitmap.createBitmap(width, height,Bitmap.Config.ARGB_8888);
                 bitmap.setPixels(filterPixels,0,width, 0, 0, width, height);
-                filterInfoResult.setResistance(getResistance());
                 filterInfoResult.setScore(score);
 //                filterInfoResult.setRatio(percentFormat);
                 if (totalDepth!=0){
@@ -149,7 +147,6 @@ public class SkinPigmentStatus extends Filter {
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 //            }else filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
-        return filterInfoResult;
     }
 
 

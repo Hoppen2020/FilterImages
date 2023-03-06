@@ -22,9 +22,13 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class FacePorphyrin extends FaceFilter {
 
+   /**
+    *
+    * 30↓——level1 30-80——level2 80-500——level3 500↑——level4
+    */
+
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
          Bitmap operateBitmap = getFaceAreaImage();
          Mat operateMat = new Mat();
          Utils.bitmapToMat(operateBitmap,operateMat);
@@ -53,6 +57,28 @@ public class FacePorphyrin extends FaceFilter {
             Imgproc.drawContours(drawPointsMat,contours,i,new Scalar(0,255,0,255));
          }
 
+         float score = 85;
+         int count = contours.size();
+        //       30↓——level1 30-80——level2 80-500——level3 500↑——level4
+           if (count<=30){
+               score = ((1 - (count / 30)) * 15) + 70f;
+           }else if (count>30&&count<=80){
+               score = ((1 - ((count-30) / 50f)) * 10) + 60f;
+           }else if (count>80&&count<=500){
+               score = ((1 - ((count-80) / 420f)) * 10) + 50f;
+           }else if (count>500){
+               if (count>500 && count<=600){
+                   score =  ((1-((count - 500) /100f)) * 10) + 40;
+               }else if (count>600 && count<=700){
+                   score =  ((1-((count - 600) /100f)) * 10) + 30;
+               }else if (count>700 && count<=800){
+                   score =  ((1-((count - 700) /100f)) * 10) + 20;
+               }else {
+                   score = 20;
+               }
+           }
+         filterInfoResult.setScore((int) score);
+
          Utils.matToBitmap(drawPointsMat,operateBitmap);
 
          operateMat.release();
@@ -62,7 +88,7 @@ public class FacePorphyrin extends FaceFilter {
 
 
          filterInfoResult.setFilterBitmap(operateBitmap);
-         filterInfoResult.setDataTypeString(getFilterDataType(),contours.size());
+         filterInfoResult.setDataTypeString(getFilterDataType(),count);
 
          Imgproc.cvtColor(hsvMat,hsvMat,Imgproc.COLOR_GRAY2RGBA);
 
@@ -70,7 +96,6 @@ public class FacePorphyrin extends FaceFilter {
 
          filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 
-      return filterInfoResult;
    }
 
 

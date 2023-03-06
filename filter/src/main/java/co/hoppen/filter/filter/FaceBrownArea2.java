@@ -25,8 +25,7 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceBrownArea2 extends FaceFilter{
 
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
       Mat operateMat = new Mat();
       Utils.bitmapToMat(getOriginalImage(),operateMat);
 
@@ -36,6 +35,11 @@ public class FaceBrownArea2 extends FaceFilter{
       CLAHE clahe = Imgproc.createCLAHE(3.0d,new Size(8,8));
       clahe.apply(operateMat,operateMat);
 
+      Mat faceMaskMat =  getFaceMask();
+//      LogUtils.e(faceMaskMat.toString());
+
+      byte[] maskP = new byte[faceMaskMat.channels() * faceMaskMat.cols()];
+
 
       int channels = operateMat.channels();
       int col = operateMat.cols();
@@ -43,13 +47,22 @@ public class FaceBrownArea2 extends FaceFilter{
 
       byte[] p = new byte[channels * col];
 
+      float totalSkin = 0;
+
       for (int h = 0; h < row; h++) {
          operateMat.get(h, 0, p);
+         faceMaskMat.get(h,0,maskP);
          for (int w = 0; w < col; w++) {
+            int maskGray = maskP[w] & 0xff;
             int index = channels * w;
-            float percent = 0.5f;
-            int gray = (int) (percent * ((int)p[index] & 0xff) + 255 * (1 - percent));
-            p[index] = (byte) gray;
+            if (maskGray!=0){
+               float percent = 0.5f;
+               int gray = (int) (percent * ((int)p[index] & 0xff) + 255 * (1 - percent));
+               p[index] = (byte) gray;
+               totalSkin++;
+            }else {
+               p[index] = -1;
+            }
          }
          operateMat.put(h, 0, p);
       }
@@ -96,6 +109,8 @@ public class FaceBrownArea2 extends FaceFilter{
       float[] hsvVP = new float[matV.channels() * col];
 
 
+      float count = 0;
+
       for (int h = 0; h < row; h++) {
          operateMat.get(h, 0, p);
          matH.get(h,0,hsvHP);
@@ -103,29 +118,35 @@ public class FaceBrownArea2 extends FaceFilter{
          matV.get(h,0,hsvVP);
          for (int w = 0; w < col; w++) {
             int index = channels * w;
-            int gray = p[index] & 0xff;
+
             float hsvH = 0;
             float hsvS = 0;
             float hsvV = 0;
 
-            if (gray<cs1){
-               hsvH = a0 - (((a1-a0)*cs0) / (cs1-cs0)) + (((a1-a0) * gray)/(cs1-cs0));
-               hsvS = b0 - (((b1-b0)*cs0) /(cs1-cs0)) + (((b1-b0) * gray)/(cs1-cs0));
-               hsvV = c0 - (((c1-c0)*cs0) /(cs1-cs0)) + (((c1-c0) * gray)/(cs1-cs0));
-            }else if (gray>=cs1&&gray<cs2){
-               hsvH = a1 - (((a2-a1)*cs1)/(cs2-cs1)) + (((a2-a1) * gray) / (cs2-cs1));
-               hsvS = b1 - (((b2-b1)*cs1)/(cs2-cs1)) + (((b2-b1) * gray) / (cs2-cs1));
-               hsvV = c1 - (((c2-c1)*cs1)/(cs2-cs1)) + (((c2-c1) * gray) / 255f);
-            }else if (gray>=cs2&&gray<cs3){
-               hsvH = a2 -(((a3-a2)*cs2)/(cs3-cs2)) + (((a3-a2) * gray) / (cs3-cs2));
-               hsvS = b2 -(((b3-b2)*cs2)/(cs3-cs2)) + (((b3-b2) * gray) / (cs3-cs2));
-               hsvV = c1 -(((c3-c1)*cs1)/(cs3-cs1)) + (((c3-c1) * gray) / 255f);
-            }else if (gray>=cs3&&gray<cs4){
-               hsvH = a3 - (((a4-a3)*cs3) / (cs4-cs3)) + (((a4-a3)*gray) / (cs4-cs3));
-               hsvS = b3 - (((b4-b3)*cs3) / (cs4-cs3)) + (((b4-b3)*gray) / (cs4-cs3));
-               hsvV = c3 - (((c4-c3)*cs1) / (cs4-cs3)) + (((c4-c3)*gray) / 255f);
-            }
             int hsvIndex = matH.channels() * w;
+
+            if (p[index]!=-1){
+               int gray = p[index] & 0xff;
+               if (gray<cs1){
+                  hsvH = a0 - (((a1-a0)*cs0) / (cs1-cs0)) + (((a1-a0) * gray)/(cs1-cs0));
+                  hsvS = b0 - (((b1-b0)*cs0) /(cs1-cs0)) + (((b1-b0) * gray)/(cs1-cs0));
+                  hsvV = c0 - (((c1-c0)*cs0) /(cs1-cs0)) + (((c1-c0) * gray)/(cs1-cs0));
+               }else if (gray>=cs1&&gray<cs2){
+                  hsvH = a1 - (((a2-a1)*cs1)/(cs2-cs1)) + (((a2-a1) * gray) / (cs2-cs1));
+                  hsvS = b1 - (((b2-b1)*cs1)/(cs2-cs1)) + (((b2-b1) * gray) / (cs2-cs1));
+                  hsvV = c1 - (((c2-c1)*cs1)/(cs2-cs1)) + (((c2-c1) * gray) / 255f);
+               }else if (gray>=cs2&&gray<cs3){
+                  hsvH = a2 -(((a3-a2)*cs2)/(cs3-cs2)) + (((a3-a2) * gray) / (cs3-cs2));
+                  hsvS = b2 -(((b3-b2)*cs2)/(cs3-cs2)) + (((b3-b2) * gray) / (cs3-cs2));
+                  hsvV = c1 -(((c3-c1)*cs1)/(cs3-cs1)) + (((c3-c1) * gray) / 255f);
+                  count++;
+               }else if (gray>=cs3&&gray<cs4){
+                  hsvH = a3 - (((a4-a3)*cs3) / (cs4-cs3)) + (((a4-a3)*gray) / (cs4-cs3));
+                  hsvS = b3 - (((b4-b3)*cs3) / (cs4-cs3)) + (((b4-b3)*gray) / (cs4-cs3));
+                  hsvV = c3 - (((c4-c3)*cs1) / (cs4-cs3)) + (((c4-c3)*gray) / 255f);
+                  count++;
+               }
+            }
             hsvHP[hsvIndex] = hsvH;
             hsvSP[hsvIndex] = hsvS;
             hsvVP[hsvIndex] = hsvV;
@@ -150,9 +171,39 @@ public class FaceBrownArea2 extends FaceFilter{
 
       Imgproc.cvtColor(brownMat,brownMat,Imgproc.COLOR_HSV2RGB);
 
+      faceMaskMat.release();
+      //0.63 0.64 0.64 0.64 0.64 0.71
+      //level1- 0~0.4 level2- 0.4~0.5 level3- 0.5~0.6 level4-0.6~1
+      float score = 85f;
+      float percent = count * 100f / totalSkin;
+
+      if (percent<=40){
+         //80~85
+         score = ((percent / 40) * 5) + 80f;
+      }else if (percent>40 && percent<=50){
+         //60~80
+         score = (((percent-40) / 10f) * 20f) + 60f;
+      }else if (percent>50 && percent<=70){
+         //40~60
+         score = (((percent-50) / 20f) * 10f) + 40f;
+      }else if (percent>70 && percent<=80){
+         //20~40f
+         score = (((percent-70f) / 10f) * 20f) + 20f;
+      }else {
+         //80%↑
+         score = 20f;
+      }
+
+      filterInfoResult.setScore((int) score);
+
+      filterInfoResult.setDataTypeString(getFilterDataType(),(double)percent);
+
+      //LogUtils.e(totalSkin,count,count/totalSkin);
+
+
       Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(),getOriginalImage().getConfig());
 
-      brownMat =getFilterFaceMask(brownMat);
+      //brownMat =getFilterFaceMask(brownMat);
 
       Utils.matToBitmap(brownMat,resultBitmap);
 
@@ -165,7 +216,6 @@ public class FaceBrownArea2 extends FaceFilter{
       filterInfoResult.setFilterBitmap(resultBitmap);
       filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
 
-      return filterInfoResult;
    }
 
    @Override

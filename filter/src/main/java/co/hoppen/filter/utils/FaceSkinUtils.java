@@ -2,7 +2,9 @@ package co.hoppen.filter.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Environment;
 
+import com.blankj.utilcode.util.ImageUtils;
 import com.blankj.utilcode.util.SPUtils;
 
 import org.opencv.android.Utils;
@@ -11,12 +13,12 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import co.hoppen.filter.FilterCacheConfig;
+
 /**
  * Created by YangJianHui on 2022/9/19.
  */
 public class FaceSkinUtils {
-
-   private static final String SKIN_AREA="Skin_Area";
 
    public static void saveFaceSkinArea(Bitmap bitmap){
       if (bitmap!=null){
@@ -60,7 +62,9 @@ public class FaceSkinUtils {
                skinArea++;
             }
          }
-         SPUtils.getInstance().put(SKIN_AREA,skinArea);
+         //ImageUtils.save(copy, Environment.getExternalStorageDirectory().getPath() + "/test/a.jpg", Bitmap.CompressFormat.JPEG);
+         if (!copy.isRecycled())copy.recycle();
+         SPUtils.getInstance().put(FilterCacheConfig.CACHE_FACE_SKIN_AREA,skinArea);
       }
    }
 
@@ -69,7 +73,11 @@ public class FaceSkinUtils {
     * @return
     */
    public static int getSkinArea(){
-      return SPUtils.getInstance().getInt(SKIN_AREA,0);
+      return SPUtils.getInstance().getInt(FilterCacheConfig.CACHE_FACE_SKIN_AREA,0);
+   }
+
+   public static void clearSkinArea(){
+      SPUtils.getInstance().put(FilterCacheConfig.CACHE_FACE_SKIN_AREA,0);
    }
 
 }

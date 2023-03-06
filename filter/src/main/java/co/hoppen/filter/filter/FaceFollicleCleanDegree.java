@@ -25,9 +25,14 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class FaceFollicleCleanDegree extends FaceFilter {
 
-   @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+    /**
+     * 个数:239个 35分 / 72个  65分
+     * 50↓——level1 / 50-100——level2 /  100-200——level3  200↑——level4
+     *
+     */
+
+    @Override
+   public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap originalImage = getOriginalImage();
             Bitmap createBitmap = getFaceAreaImage();
                     //originalImage.copy(Bitmap.Config.ARGB_8888,true);
@@ -38,6 +43,7 @@ public class FaceFollicleCleanDegree extends FaceFilter {
             Utils.bitmapToMat(originalImage,oriMat);
 
             List<Mat> rgbList = new ArrayList<>();
+
             Core.split(filterMat,rgbList);
 
             Mat blueMat = rgbList.get(2);
@@ -71,9 +77,37 @@ public class FaceFollicleCleanDegree extends FaceFilter {
                if (point.size().area()<20){
                   Imgproc.drawContours(resultMat,list,i,new Scalar(255,0,0,255));
                   count++;
-                   Imgproc.drawContours(areaMat,list,i,new Scalar(255,255,255,255),Imgproc.FILLED);
+                  Imgproc.drawContours(areaMat,list,i,new Scalar(255,255,255,255),Imgproc.FILLED);
                }
             }
+            //---------------------------------
+            float score = 85;
+
+            if (count<=50){
+                //70 - 85
+                score = ((1-(count / 50f)) * 15)  + 70;
+            }else if (count>50 && count<=100){
+                //60 - 70
+                score = ((1-((count-50) / 50f)) * 10) + 60;
+            }else if (count>100&&count<=200){
+                // 50 - 60
+                score = ((1-((count-100) / 100f)) * 10) + 50;
+            }else if (count>200){
+                //20 - 50
+                //score = (30 - (count - 200))  + 20;
+                if (count>200&&count<=300){
+                    score =  ((1-((count - 200) /100f)) * 10) + 40;
+                }else if (count>300 && count<=350){
+                    score =  ((1-((count - 300) /50f)) * 10) + 30;
+                }else if (count>350 &&count<=400){
+                    score =  ((1-((count - 350) /50f)) * 10) + 20;
+                }else {
+                    score = 20;
+                }
+            }
+            filterInfoResult.setScore((int) score);
+
+            //---------------------------------
 
             Utils.matToBitmap(resultMat,createBitmap);
             filterMat.release();
@@ -94,7 +128,6 @@ public class FaceFollicleCleanDegree extends FaceFilter {
             filterInfoResult.setFilterBitmap(resultBitmap);
 
             filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      return filterInfoResult;
    }
 
    @Override

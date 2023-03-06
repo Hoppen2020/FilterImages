@@ -27,8 +27,7 @@ import static org.opencv.imgproc.Imgproc.THRESH_BINARY_INV;
 public class FaceWrinkle8 extends FaceFilter {
 
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
         try {
                 Mat operateMat = new Mat();
                 Utils.bitmapToMat(getOriginalImage(),operateMat);
@@ -78,7 +77,6 @@ public class FaceWrinkle8 extends FaceFilter {
             LogUtils.e(e.toString());
             filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
         }
-        return filterInfoResult;
     }
 
 

@@ -25,9 +25,13 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class FaceEpidermisSpots extends FaceFilter {
 
+    /**
+     *
+     *  左右脸：40 额头：20
+     */
+
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
                 Bitmap originalImage = getOriginalImage();
                 Bitmap cacheBitmap = getFaceAreaImage();
 
@@ -66,6 +70,29 @@ public class FaceEpidermisSpots extends FaceFilter {
                     }
                 }
 
+                //level1 80↓ level2 80-150 level3 150-300 level4 300↑
+                float score = 85;
+
+                if (count<=80){
+                    score = ((1 - (count / 80)) * 15) + 70f;
+                }else if (count>80&&count<=150){
+                    score = ((1 - ((count-80) / 70f)) * 10) + 60f;
+                }else if (count>150&&count<=300){
+                    score = ((1 - ((count-150) / 150f)) * 10) + 50f;
+                }else if (count>300){
+                    if (count>300 && count<=400){
+                        score =  ((1-((count - 300) /100f)) * 10) + 40;
+                    }else if (count>400 && count<=500){
+                        score =  ((1-((count - 400) /100f)) * 10) + 30;
+                    }else if (count>500 && count<=800){
+                        score =  ((1-((count - 500) / 300f)) * 10) + 20;
+                    }else {
+                        score = 20;
+                    }
+                }
+                filterInfoResult.setScore((int) score);
+
+
                 Utils.matToBitmap(resultMat,cacheBitmap);
 
                 //resultMat.release();
@@ -81,7 +108,6 @@ public class FaceEpidermisSpots extends FaceFilter {
                 filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(resultMat,1));
                 filterInfoResult.setDataTypeString(getFilterDataType(),count);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        return filterInfoResult;
     }
 
     @Override

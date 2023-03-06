@@ -23,8 +23,7 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceSkinVeins2 extends FaceFilter {
 
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
         try {
             Bitmap originalImage = getOriginalImage();
                 Bitmap operateBitmap = getFaceAreaImage();
@@ -114,7 +113,6 @@ public class FaceSkinVeins2 extends FaceFilter {
             LogUtils.e(e.toString());
             filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
         }
-        return filterInfoResult;
     }
 
     @Override

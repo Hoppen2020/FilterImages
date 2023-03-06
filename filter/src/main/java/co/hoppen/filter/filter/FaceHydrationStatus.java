@@ -3,6 +3,10 @@ package co.hoppen.filter.filter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.hardware.usb.UsbConstants;
+import android.hardware.usb.UsbDevice;
+
+import com.blankj.utilcode.util.LogUtils;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
@@ -18,10 +22,14 @@ import co.hoppen.filter.utils.FaceSkinUtils;
  * Created by YangJianHui on 2022/3/3.
  */
 public class FaceHydrationStatus extends FaceFilter{
+    /**
+     *  计算分值占比:脸颊部分75-80 额头25-20
+     *
+     */
 
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
+
                 Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -47,7 +55,7 @@ public class FaceHydrationStatus extends FaceFilter{
                 int avgGray = totalGray / count;
                 double totalCountPixels = 0;
                 double totalWaterPixels = 0;
-                double totalPercentPixels = 0;
+                float totalPercentPixels = 0;
                 double hash = 0;
                 for (int i = 0; i <originalPixels.length ; i++) {
                     int gray = filterPixels[i];
@@ -70,50 +78,39 @@ public class FaceHydrationStatus extends FaceFilter{
                         areaPixels[i] = Color.WHITE;
                     }
                 }
-                totalCountPixels = totalWaterPixels * 60 + totalCountPixels * 2;
-                hash = totalCountPixels / count;
-                int score = 0;
 
-                if (hash<=0){
-                    score = new Random().nextInt(5) + 40;
-                }else score = (int) (40 + hash * 40);
+                float score = 85;
 
-                if (getResistance()!=0){
-                    if (getResistance()<=10){
-                        score = 20 +new Random().nextInt(3);
-                    }else {
-                        int x = (int) ((getResistance()-10) * 7 / 9 +20);
-                        if (x>=85){
-                            score =85+new Random().nextInt(3);
-                        }else{
-                            score = x;
-                        }
-                    }
-                    if (score<=19){
-                        score = new Random().nextInt(10) + 30;
-                    } else if (score>=20&&score<=29){
-                        score=(score-20)  * 25/9 +20;
-                    }else if (score>=30&&score<=35){
-                        score=(score-30)  * 15/5 +45;
-                    }else if (score>=36&&score<=39){
-                        score=(score-36)  * 15/3 +50;
-                    }else if (score>=40&&score<=75){
-                        score=(score-40)  * 10/25 +60;
-                    }else if (score>=76&&score<=80){
-                        score=(score-76)  * 9/5 +71;
-                    }else if (score>=81&&score<=89){
-                        score=(score-80)  * 14/9 +75;
-                    }else if (score<=90){
-                        score= new Random().nextInt(5)+80;
-                    }
-                }else {
-                    if (score > 80) {
-                        score = 78+new Random().nextInt(3);
-                    }
-                    if (score<40){
-                        score =38+new Random().nextInt(3);
-                    }
+                //获取记录的皮肤区域大小
+                float skinArea = FaceSkinUtils.getSkinArea();
+                LogUtils.e(skinArea);
+                if (skinArea==0){
+                    skinArea = count * 0.4f;
                 }
+                    if (totalPercentPixels<skinArea){
+                        float percent = totalPercentPixels * 100f / skinArea;
+                        LogUtils.e(percent);
+                        //level1 = 50↑ level2 = 40 - 50 level3 = 25 - 40 level4 = 0 - 25
+                        if (percent>0 && percent<=25){
+                            //35-40
+                            score = ((percent / 25f) * 10f)  + 35f;
+                        }else if (percent>25 && percent<=40){
+                            //45-60
+                            score = (((percent-25f) / 15f) * 15f)  + 45f;
+                        }else if (percent>40 && percent<=50){
+                            //60-65
+                            score = (((percent-40f) / 10f) * 5f)  + 60f;
+                        }else if (percent>50 &&percent<=100){
+                            //65-85
+                            score = (((percent - 50f) / 50f) * 20f)  + 65f;
+                        }
+                    }else score = 65f;
+
+
+                filterInfoResult.setScore((int) score);
+//                totalCountPixels = totalWaterPixels * 60 + totalCountPixels * 2;
+//                hash = totalCountPixels / count;
+
 
                 Bitmap bitmap = Bitmap.createBitmap(width, height,Bitmap.Config.ARGB_8888);
                 bitmap.setPixels(filterPixels,0,width, 0, 0, width, height);
@@ -125,10 +122,8 @@ public class FaceHydrationStatus extends FaceFilter{
                 Utils.bitmapToMat(areaBitmap,areaMat);
                 areaBitmap.recycle();
 
-                filterInfoResult.setResistance(getResistance());
-                filterInfoResult.setScore(score);
 
-                int skinArea = FaceSkinUtils.getSkinArea();
+                //int skinArea = FaceSkinUtils.getSkinArea();
                 if (skinArea>0 && skinArea>totalPercentPixels){
                     double data =  totalPercentPixels * 100d / skinArea;
                     filterInfoResult.setDataTypeString(getFilterDataType(),data);
@@ -142,7 +137,6 @@ public class FaceHydrationStatus extends FaceFilter{
                 filterInfoResult.setFilterBitmap(resultBitmap);
                 filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat));
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        return filterInfoResult;
     }
 
     @Override

@@ -23,8 +23,7 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceBrownArea3 extends FaceFilter{
 
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
       try {
          Bitmap operateBitmap = getFaceAreaImage();
          Mat operateMat = new Mat();
@@ -179,7 +178,6 @@ public class FaceBrownArea3 extends FaceFilter{
       }catch (Exception e){
          filterInfoResult.setStatus(FilterInfoResult.Status.FAILURE);
       }
-      return filterInfoResult;
    }
 
    @Override

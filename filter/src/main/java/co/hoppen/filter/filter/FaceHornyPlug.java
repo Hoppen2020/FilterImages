@@ -22,9 +22,13 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class FaceHornyPlug extends FaceFilter {
 
+   /**
+    *
+    * 1200↑level4 1200-400level3 200-400——level2 200↓——level1
+    */
+
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
          Bitmap operateBitmap = getFaceAreaImage();
          Mat operateMat = new Mat();
          Utils.bitmapToMat(operateBitmap,operateMat);
@@ -51,20 +55,48 @@ public class FaceHornyPlug extends FaceFilter {
             Imgproc.drawContours(drawPointsMat,contours,i,new Scalar(255,255,0,255));
          }
 
+         int count = contours.size();
+         float score = 85;
+         // 800↑level4  800-400level3  200-400——level2  200↓——level1
+         if (count<=200){
+             //70 - 85
+             score = ((1 - (count / 200f)) * 15) + 70f;
+         }else if (count>200 && count<=400){
+             //60 - 70
+             score = ((1 - ((count-200) / 200f)) * 10) + 60f;
+         }else if (count>400 && count<=600){
+             //50 - 60
+             score = ((1 - ((count-400) / 200f)) * 10) + 50f;
+         }else if (count>600){
+             //30 - 50
+             if (count>600 && count <=800){
+                 //40 - 50
+                 score =  ((1-((count - 600) /200f)) * 10) + 40;
+             }else if (count>800 && count<=1000){
+                 //30 - 40
+                 score =  ((1-((count - 800) /200f)) * 10) + 30;
+             }else if (count>1000 && count<=1100){
+                 //20 - 30
+                 score =  ((1-((count - 1000) /100f)) * 10) + 20;
+             }else {
+                 score = 20;
+             }
+         }
+         filterInfoResult.setScore((int) score);
+
          Utils.matToBitmap(drawPointsMat,operateBitmap);
          structuringElement.release();
          hierarchy.release();
          drawPointsMat.release();
 
          filterInfoResult.setFilterBitmap(operateBitmap);
-         filterInfoResult.setDataTypeString(getFilterDataType(),contours.size());
+         filterInfoResult.setDataTypeString(getFilterDataType(),count);
 
          Imgproc.cvtColor(hsvMat,hsvMat,Imgproc.COLOR_GRAY2RGBA);
 
          filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(hsvMat,39));
 
          filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      return filterInfoResult;
    }
 
    @Override

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import co.hoppen.filter.FilterHelper;
 import co.hoppen.filter.FilterInfoResult;
 import co.hoppen.filter.FilterType;
+import co.hoppen.filter.OnDetectFaceListener;
 import co.hoppen.filter.OnFilterListener;
 
 /**
@@ -39,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
       setContentView(R.layout.activity_main);
       oriView = findViewById(R.id.iv_ori);
       filterView = findViewById(R.id.iv_filter);
-      Bitmap imageFromAssetsFile = getImageFromAssetsFile("5.jpg");
+      Bitmap imageFromAssetsFile = getImageFromAssetsFile("222222.jpg");
       oriView.setImageBitmap(imageFromAssetsFile);
 
       File file = new File(Environment.getExternalStorageDirectory().getPath() + "/test");
@@ -49,17 +50,31 @@ public class MainActivity extends AppCompatActivity {
 
       FilterHelper filterHelper = new FilterHelper();
       try {
-         filterHelper.execute(FilterType.FACE_UV_SPOT, imageFromAssetsFile, 0, file.getPath() + "/111.jpg", new OnFilterListener() {
+
+         filterHelper.detectFace(imageFromAssetsFile, true, new OnDetectFaceListener() {
             @Override
-            public void onFilter(FilterInfoResult filterInfoResult) {
-               LogUtils.e(filterInfoResult.toString());
-               String filterImagePath = filterInfoResult.getFilterImagePath();
-               LogUtils.e(filterImagePath);
-               Bitmap bitmap = ImageUtils.getBitmap(filterImagePath);
-               if (bitmap!=null)filterView.setImageBitmap(bitmap);
-               filterView.setVisibility(View.VISIBLE);
+            public void onDetectSuccess() {
+               try {
+                  filterHelper.execute(FilterType.FACE_RED_BLOOD, imageFromAssetsFile, 0, file.getPath() + "/1.jpg", new OnFilterListener() {
+                     @Override
+                     public void onFilter(FilterInfoResult filterInfoResult) {
+                        LogUtils.e(filterInfoResult.toString());
+                        String filterImagePath = filterInfoResult.getFilterImagePath();
+                        //LogUtils.e(filterImagePath);
+                        Bitmap bitmap = ImageUtils.getBitmap(filterImagePath);
+                        if (bitmap!=null)filterView.setImageBitmap(bitmap);
+                        filterView.setVisibility(View.VISIBLE);
+                     }
+                  });
+               }catch (Exception e){
+               }
+            }
+            @Override
+            public void onDetectFaceFailure() {
+
             }
          });
+
       } catch (Exception e) {
          e.printStackTrace();
       }

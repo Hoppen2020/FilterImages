@@ -30,9 +30,10 @@ public class FilterInfoResult {
         this.filterImagePath = filterImagePath;
     }
 
-    public FilterInfoResult(FilterType type,String filterImagePath){
+    public FilterInfoResult(FilterType type,String filterImagePath,float resistance){
         this.type = type;
         this.filterImagePath = filterImagePath;
+        this.resistance = resistance;
     }
 
     public String getFilterImagePath() {
@@ -67,10 +68,6 @@ public class FilterInfoResult {
         return resistance;
     }
 
-    public void setResistance(float resistance) {
-        this.resistance = resistance;
-    }
-
     public Status getStatus() {
         return status;
     }
@@ -100,7 +97,7 @@ public class FilterInfoResult {
                 dataTypeString = bigDecimal.doubleValue() + "%";
                 break;
             case COLOR:
-
+                dataTypeString = "#"+(String) obj;
                 break;
             case COUNT:
                 dataTypeString = (int)obj + StringUtils.getString(R.string.count);
@@ -119,6 +116,7 @@ public class FilterInfoResult {
                 ", score=" + score +
                 ", resistance=" + resistance +
                 ", status=" + status +
+                ", dataTypeString=" + dataTypeString +
                 '}';
     }
 

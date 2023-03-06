@@ -31,6 +31,7 @@ import java.util.List;
 
 import co.hoppen.filter.FaceAreaInfo;
 import co.hoppen.filter.FacePart;
+import co.hoppen.filter.FilterCacheConfig;
 import co.hoppen.filter.FilterDataType;
 import co.hoppen.filter.utils.CutoutUtils;
 import static com.huawei.hms.mlsdk.face.MLFaceShape.TYPE_FACE;
@@ -61,11 +62,14 @@ public abstract class FaceFilter extends Filter{
             SparseArray<MLFace> mlFaceSparseArray = analyzer.analyseFrame(frame);
             if (mlFaceSparseArray.size()>0){
                 faceResult = mlFaceSparseArray.get(0);
-                //记录上一次定位数据
+                //记录定位数据
                 String face = GsonUtils.toJson(faceResult);
-                SPUtils.getInstance().put("face",face);
+                SPUtils.getInstance().put(FilterCacheConfig.CACHE_FACE,face);
             }else {
-                faceResult = GsonUtils.fromJson(SPUtils.getInstance().getString("face"),GsonUtils.getType(MLFace.class));
+                //因uv、伍氏光，无法识别人脸，保底使用上次缓存
+                faceResult = GsonUtils.fromJson(
+                        SPUtils.getInstance()
+                                .getString(FilterCacheConfig.CACHE_FACE),GsonUtils.getType(MLFace.class));
             }
             analyzer.stop();
             if (faceResult!=null){
@@ -85,7 +89,7 @@ public abstract class FaceFilter extends Filter{
 
     public Mat getFilterFaceMask(Mat operateMat){
         Mat faceMask = getFaceMask();
-        LogUtils.e(faceMask==null);
+//        LogUtils.e(faceMask==null);
         if (faceMask!=null){
             Mat frontDst = new Mat(); //frontAndBack
             operateMat.copyTo(frontDst,faceMask);

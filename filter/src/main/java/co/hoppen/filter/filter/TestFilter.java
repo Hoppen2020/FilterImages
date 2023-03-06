@@ -12,8 +12,7 @@ import co.hoppen.filter.FilterInfoResult;
  */
 public class TestFilter extends Filter{
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap originalImage = getOriginalImage();
                 int width = originalImage.getWidth();
                 int height = originalImage.getHeight();
@@ -53,13 +52,10 @@ public class TestFilter extends Filter{
 
                 Bitmap bitmap = Bitmap.createBitmap(width, height,Bitmap.Config.ARGB_8888);
                 bitmap.setPixels(filterPixels,0,width, 0, 0, width, height);
-                filterInfoResult.setResistance(getResistance());
                 filterInfoResult.setScore(0);
 //                filterInfoResult.setRatio(0);
                 filterInfoResult.setFilterBitmap(bitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-
-        return filterInfoResult;
     }
 
     private  double GX(int x, int y, Bitmap bitmap) {

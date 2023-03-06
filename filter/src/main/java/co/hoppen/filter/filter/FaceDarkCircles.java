@@ -5,6 +5,8 @@ import android.graphics.Color;
 
 import androidx.core.graphics.ColorUtils;
 
+import com.blankj.utilcode.util.LogUtils;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -21,10 +23,17 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceDarkCircles extends FaceFilter {
 
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
             Bitmap originalImage = getOriginalImage();
             Bitmap filterBitmap = getFaceAreaImage();
+
+            int width = originalImage.getWidth();
+            int height = originalImage.getHeight();
+            //计算面积容器
+            int [] countArea = new int[width * height];
+            filterBitmap.getPixels(countArea, 0, width, 0, 0, width, height);
+
+            //Bitmap t = filterBitmap.copy(filterBitmap.getConfig(),false);
 
             Mat filterMat = new Mat();
             Utils.bitmapToMat(filterBitmap,filterMat);
@@ -57,8 +66,6 @@ public class FaceDarkCircles extends FaceFilter {
             Utils.matToBitmap(yCrCb,filterBitmap);
 
 
-            int width = originalImage.getWidth();
-            int height = originalImage.getHeight();
 
             int [] originalPixels = new int[width * height];
             int [] filterPixels = new int[width*height];
@@ -71,7 +78,19 @@ public class FaceDarkCircles extends FaceFilter {
             Bitmap areaBitmap = Bitmap.createBitmap(originalImage.getWidth(), originalImage.getHeight(), Bitmap.Config.ARGB_8888);
             areaBitmap.setPixels(areaPixels, 0, width, 0, 0, width, height);
 
+
+            float totalCount = 0;
+            float count = 0;
+            double totalColor = 0;
+
+            int totalR = 0;
+            int totalG = 0;
+            int totalB = 0;
+
             for (int i = 0; i < filterPixels.length; i++) {
+               if (countArea[i]!=0){
+                   totalCount++;
+               }
                areaPixels[i] = Color.BLACK;
                if (filterPixels[i]==Color.BLACK){
                   resultPixels[i] = originalPixels[i];
@@ -81,8 +100,62 @@ public class FaceDarkCircles extends FaceFilter {
                   ColorUtils.colorToLAB(originalPixels[i],lab);
                   lab[0] = lab[0] - (lab[0] * 0.2f);
                   resultPixels[i] = ColorUtils.LABToColor(lab[0],lab[1],lab[2]);
+                  totalColor += colorDepth(originalPixels[i]);
+                  count++;
+                  totalR += Color.red(originalPixels[i]);
+                  totalG += Color.green(originalPixels[i]);
+                  totalB += Color.blue(originalPixels[i]);
                }
             }
+            totalR = (int) (totalR / count);
+            totalG = (int) (totalG / count);
+            totalB = (int) (totalB / count);
+
+
+            LogUtils.e(totalG,totalG,totalB);
+            int color = Color.rgb(totalR,totalG,totalB);
+            LogUtils.e(color);
+            String rgbString = com.blankj.utilcode.util.ColorUtils.int2RgbString(color);
+
+            //0.38  0.15 0.28
+            //面积占比：level1——0.05 level2——0.05~0.15 level3——0.15~0.25 level4——0.25↑
+            // 86 63 85
+            //颜色平均深度：level1——255~127 level2——127~100 level3——100~60 level4——60~0
+            //total:55  6:4
+            float proportion = count / totalCount * 100f;
+            LogUtils.e(proportion , count,totalCount);
+            float score1 = 33;//39
+            if (proportion<=5f){
+                score1 = ((1 - (proportion / 5f)) * 9f) + 24f;
+            }else if (proportion>5f && proportion<=20f){
+                score1 = ((1 - ((proportion - 5f) / 15f)) * 7.5f) + (5 * 4);
+            }else if (proportion>20f && proportion<=30f){
+                score1 = ((1 - ((proportion - 20f) / 10f)) * 7f) + (5 * 3);
+            }else if (proportion>30f && proportion<=40f){
+                score1 = ((1 - ((proportion - 30f) / 10f)) * 6.5f) + (5 * 2);
+            }else if (proportion>40f && proportion<=50f){
+                score1 = ((1 - ((proportion - 40f) / 10f)) * 6f) + 5f;
+            }else if (proportion>50f){
+                score1 = 5f;
+            }
+
+            float avgLight = (float) (totalColor / count);
+            LogUtils.e(avgLight , totalColor,count);
+            float score2 = 22;//6.5
+            if (avgLight<=60){//level4
+                score2 = (avgLight / 60 * 5.5f);
+            }else if (avgLight>60 && avgLight<=70){
+                score2 = (((avgLight - 60) / 10) * 5.5f) + (5.5f);
+            }else if (avgLight>70 && avgLight<=127){
+                score2 = (((avgLight - 70) / 57) * 5.5f) + (5.5f * 2);
+            }else if (avgLight>127 && avgLight<=255){
+                score2 = (((avgLight - 127) / 128) * 5.5f) + (5.5f * 3);
+            }
+
+            filterInfoResult.setScore((int) (30 + score1 + score2));
+            LogUtils.e(score1,score2);
+            //LogUtils.e(totalColor,count,totalColor/count,totalCount);
+
             filterBitmap.setPixels(resultPixels,0,width, 0, 0, width, height);
             areaBitmap.setPixels(areaPixels,0,width, 0, 0, width, height);
 
@@ -95,10 +168,9 @@ public class FaceDarkCircles extends FaceFilter {
             Mat areaMat = new Mat();
             Utils.bitmapToMat(areaBitmap,areaMat);
             filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat));
-
+            filterInfoResult.setDataTypeString(getFilterDataType(),rgbString);
             filterInfoResult.setFilterBitmap(filterBitmap);
             filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      return filterInfoResult;
    }
 
    @Override
@@ -111,11 +183,14 @@ public class FaceDarkCircles extends FaceFilter {
       return FilterDataType.COLOR;
    }
 
-//   @Override
-//   public FaceAreaInfo createAreaBitmap(Object... obj) {
-//      Bitmap areaBitmap = (Bitmap) obj[0];
-//      Mat mat = new Mat();
-//      Utils.bitmapToMat(areaBitmap,mat);
-//      return createFaceArea(mat);
-//   }
+    /**
+     *
+     * @param color
+     * @return 0~255
+     */
+   private int colorDepth(int color){
+       return (int) (0.299f * Color.red(color) + 0.587f * Color.green(color) + 0.114f * Color.blue(color));
+   }
+
+
 }

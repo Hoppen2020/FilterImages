@@ -5,6 +5,8 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.blankj.utilcode.util.LogUtils;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -29,8 +31,7 @@ public class FaceRedBlood2 extends FaceFilter{
 
    @RequiresApi(api = Build.VERSION_CODES.N)
    @Override
-   public FilterInfoResult onFilter() {
-      FilterInfoResult filterInfoResult = getFilterInfoResult();
+   public void onFilter(FilterInfoResult filterInfoResult) {
           Mat operateMat = new Mat();
           Utils.bitmapToMat(getOriginalImage(),operateMat);
 
@@ -55,19 +56,74 @@ public class FaceRedBlood2 extends FaceFilter{
 
           Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_HSV2RGB);
 
+          Mat maskMat = getFaceMask();
+
+          byte [] maskByte = new byte[maskMat.channels() * maskMat.cols()];
+          byte [] operateByte = new byte[operateMat.channels() * operateMat.cols()];
+
+          float count = 0;
+          float totalCount = 0;
+
+          for (int h = 0; h < operateMat.rows(); h++) {
+              operateMat.get(h,0,operateByte);
+              maskMat.get(h,0,maskByte);
+              for (int w = 0; w < operateMat.cols(); w++) {
+                  int index = operateMat.channels() * w;
+                  int maskGray = maskByte[w] & 0xff;
+                  if (maskGray!=0){
+                      totalCount++;
+                      int r =  operateByte[index]&0xff;
+                      if (r<=110){
+                          count++;
+                      }
+                  }else {
+                      operateByte[index] = 0;
+                      operateByte[index +1] = 0;
+                      operateByte[index + 2] = 0;
+                  }
+              }
+              operateMat.put(h,0,operateByte);
+          }
+
+          float score = 85f;
+          float percent = count * 100f /totalCount;
+
+          LogUtils.e(totalCount,count,percent);
+          //70 71 29 61 80 69
+          //level1 0~30 level2 30~50 level3 50~60 level4 60~70 70~80 80~100
+          if (percent<=30){
+              //75~85
+              score = ((1-(percent / 30f)) * 10f)  + 75f;
+          }else if (percent>30 && percent<=50){
+              //65~75
+              score = ((1-((percent - 30f) / 20f)) * 10f)  + 65f;
+          }else if (percent>50 && percent<=60){
+              //55~65
+              score = ((1-((percent - 50f) / 10f)) * 10f)  + 55f;
+          }else if (percent>60 && percent<=70){
+              //45~55
+              score = ((1-((percent - 60f) / 10f)) * 10f)  + 45f;
+          }else if (percent>70 && percent<=80){
+              //35~45
+              score = ((1-((percent - 70f) / 10f)) * 10f)  + 35f;
+          }else if (percent>80 &&percent<=90){
+              //20~35
+              score = ((1-((percent - 80f) / 10f)) * 15f)  + 20f;
+          }else {
+              score = 20f;
+          }
+          filterInfoResult.setScore((int) score);
+          filterInfoResult.setDataTypeString(getFilterDataType(),(double)percent);
 
           Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
           Utils.matToBitmap(operateMat,resultBitmap);
 
           Mat areaMat = new Mat();
           Utils.bitmapToMat(getFaceAreaImage(),areaMat);
-
-
           filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat,1));
 
           filterInfoResult.setFilterBitmap(resultBitmap);
           filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-      return filterInfoResult;
    }
 
    @Override

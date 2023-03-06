@@ -21,9 +21,13 @@ import co.hoppen.filter.utils.FaceSkinUtils;
  */
 public class FaceOilSecretion extends FaceFilter{
 
+    /**
+     *
+     * 计算占比：鼻子40 额头 30 脸颊 15
+     */
+
     @Override
-    public FilterInfoResult onFilter() {
-        FilterInfoResult filterInfoResult = getFilterInfoResult();
+    public void onFilter(FilterInfoResult filterInfoResult) {
                 Bitmap originalImage = getOriginalImage();
                 Bitmap bitmap =  getFaceAreaImage();
                 Mat yuvMat = new Mat();
@@ -91,6 +95,39 @@ public class FaceOilSecretion extends FaceFilter{
                         }
                     }
                 }
+                float skinArea = FaceSkinUtils.getSkinArea();
+
+                if (skinArea==0){
+                    skinArea = skinArea * 0.2f;
+                }
+                float score = 85;
+
+                //level1——0~5 level2——5~10 level3——10~20 level4 20~100
+                if (areaCount<skinArea) {
+                    float percent = areaCount * 100f / skinArea;
+                    if (percent>15 && percent<=100){
+                        //20 - 40
+//                        score = ((percent / 25f) * 10f)  + 35f;
+                        score = ((1-((percent - 15f) / 75f)) * 20f)  + 20f;
+                        //score = ((percent / 20f) * 80f)  + 20f;
+                    }else if (percent>10 &&percent<=15){
+                        //40 - 60
+                        score = ((1-((percent - 10f) / 5f)) * 20f)  + 40f;
+                    }else if (percent>5 &&percent<=10){
+                        //60 - 70
+                        score = ((1-((percent - 5) / 5f)) * 10f)  + 60f;
+                    }else if (percent>0 &&percent<=5){
+                        //70 - 85
+                        score = ((1-(percent/ 5f)) * 15f)  + 70f;
+                    }else {
+                        score = 65;
+                    }
+                }else {
+                    score = 65;
+                }
+
+                filterInfoResult.setScore((int) score);
+
                 Bitmap topBitmap = Bitmap.createBitmap(dst,width,height, Bitmap.Config.ARGB_8888);
                 Mat top = new Mat();
                 Utils.bitmapToMat(topBitmap,top);
@@ -106,14 +143,13 @@ public class FaceOilSecretion extends FaceFilter{
                 Utils.bitmapToMat(Bitmap.createBitmap(area,width,height, Bitmap.Config.ARGB_8888),mat);
                 filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(mat));
 
-                int skinArea = FaceSkinUtils.getSkinArea();
+
                 if (skinArea>0 && skinArea>areaCount){
                     double data =  areaCount * 100d / skinArea;
                     filterInfoResult.setDataTypeString(getFilterDataType(),data);
                 }
                 filterInfoResult.setFilterBitmap(topBitmap);
                 filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-        return filterInfoResult;
     }
 
     @Override
