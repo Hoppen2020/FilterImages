@@ -117,7 +117,7 @@ public class FaceNearRedLight extends FaceFilter{
             score = ((1-((areaPercent - 30f) / 10f)) * 10f)  + 50f;
         }else if (areaPercent>40 && areaPercent<=50){
             //30~50
-            score = ((1-((areaPercent - 40f) / 10f)) * 10f)  + 30f;
+            score = ((1-((areaPercent - 40f) / 10f)) * 20)  + 30f;
         }else {
             score = 20;
         }

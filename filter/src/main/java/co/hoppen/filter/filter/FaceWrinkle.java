@@ -115,7 +115,7 @@ public class FaceWrinkle extends FaceFilter {
         }
         allFaceBitmap.setPixels(operatePixels,0,width, 0, 0, width, height);
 
-        LogUtils.e(totalCount,areaCount,areaCount * 100f /totalCount);
+        //LogUtils.e(totalCount,areaCount,areaCount * 100f /totalCount);
         //test 0.89  1.41 0.47
         //level1 0.05~0.20 level2 0.2~0.5 level3 0.5~1.2 level4 1.2~5.0
         float percent = areaCount * 100f /totalCount;

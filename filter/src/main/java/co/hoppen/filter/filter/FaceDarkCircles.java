@@ -126,16 +126,22 @@ public class FaceDarkCircles extends FaceFilter {
             LogUtils.e(proportion , count,totalCount);
             float score1 = 33;//39
             if (proportion<=5f){
-                score1 = ((1 - (proportion / 5f)) * 9f) + 24f;
+                //30-33
+                score1 = ((1 - (proportion / 5f)) * 3f) + 30;
             }else if (proportion>5f && proportion<=20f){
-                score1 = ((1 - ((proportion - 5f) / 15f)) * 7.5f) + (5 * 4);
+                //25-30
+                score1 = ((1 - ((proportion - 5f) / 15f)) * 5f) + 25;
             }else if (proportion>20f && proportion<=30f){
-                score1 = ((1 - ((proportion - 20f) / 10f)) * 7f) + (5 * 3);
+                //20-25
+                score1 = ((1 - ((proportion - 20f) / 10f)) * 5f) + 20;
             }else if (proportion>30f && proportion<=40f){
-                score1 = ((1 - ((proportion - 30f) / 10f)) * 6.5f) + (5 * 2);
+                //15-20
+                score1 = ((1 - ((proportion - 30f) / 10f)) * 5f) + 15;
             }else if (proportion>40f && proportion<=50f){
-                score1 = ((1 - ((proportion - 40f) / 10f)) * 6f) + 5f;
+                //5-15
+                score1 = ((1 - ((proportion - 40f) / 10f)) * 10f) + 5f;
             }else if (proportion>50f){
+                //5
                 score1 = 5f;
             }
 
@@ -143,13 +149,17 @@ public class FaceDarkCircles extends FaceFilter {
             LogUtils.e(avgLight , totalColor,count);
             float score2 = 22;//6.5
             if (avgLight<=60){//level4
-                score2 = (avgLight / 60 * 5.5f);
+                //17-22
+                score2 = (avgLight / 60 * 7f);
             }else if (avgLight>60 && avgLight<=70){
-                score2 = (((avgLight - 60) / 10) * 5.5f) + (5.5f);
+                //12-17
+                score2 = (((avgLight - 60) / 10) * 5f) + 7f;
             }else if (avgLight>70 && avgLight<=127){
-                score2 = (((avgLight - 70) / 57) * 5.5f) + (5.5f * 2);
+                //7-12
+                score2 = (((avgLight - 70) / 57) * 5f) + 12f;
             }else if (avgLight>127 && avgLight<=255){
-                score2 = (((avgLight - 127) / 128) * 5.5f) + (5.5f * 3);
+                //0-7
+                score2 = (((avgLight - 127) / 128) * 5f) + 17f;
             }
 
             filterInfoResult.setScore((int) (30 + score1 + score2));

@@ -185,7 +185,7 @@ public class FaceBrownArea2 extends FaceFilter{
          score = (((percent-40) / 10f) * 20f) + 60f;
       }else if (percent>50 && percent<=70){
          //40~60
-         score = (((percent-50) / 20f) * 10f) + 40f;
+         score = (((percent-50) / 20f) * 20f) + 40f;
       }else if (percent>70 && percent<=80){
          //20~40f
          score = (((percent-70f) / 10f) * 20f) + 20f;
