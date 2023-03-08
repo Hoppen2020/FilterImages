@@ -97,10 +97,10 @@ public class FilterInfoResult {
                 dataTypeString = bigDecimal.doubleValue() + "%";
                 break;
             case COLOR:
-                dataTypeString = "#"+(String) obj;
+                dataTypeString = (String) obj;
                 break;
             case COUNT:
-                dataTypeString = (int)obj + StringUtils.getString(R.string.count);
+                dataTypeString = (int)obj +"";
                 break;
         }
 

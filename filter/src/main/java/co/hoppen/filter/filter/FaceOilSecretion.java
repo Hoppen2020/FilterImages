@@ -108,17 +108,17 @@ public class FaceOilSecretion extends FaceFilter{
                     if (percent>15 && percent<=100){
                         //20 - 40
 //                        score = ((percent / 25f) * 10f)  + 35f;
-                        score = ((1-((percent - 15f) / 75f)) * 20f)  + 20f;
+                        score = ((1-((percent - 15f) / 85f)) * 35f)  + 20f;
                         //score = ((percent / 20f) * 80f)  + 20f;
                     }else if (percent>10 &&percent<=15){
                         //40 - 60
-                        score = ((1-((percent - 10f) / 5f)) * 20f)  + 40f;
+                        score = ((1-((percent - 10f) / 5f)) * 10f)  + 55f;
                     }else if (percent>5 &&percent<=10){
                         //60 - 70
-                        score = ((1-((percent - 5) / 5f)) * 10f)  + 60f;
+                        score = ((1-((percent - 5) / 5f)) * 10f)  + 65f;
                     }else if (percent>0 &&percent<=5){
                         //70 - 85
-                        score = ((1-(percent/ 5f)) * 15f)  + 70f;
+                        score = ((1-(percent/ 5f)) * 10f)  + 75f;
                     }else {
                         score = 65;
                     }

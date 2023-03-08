@@ -73,7 +73,7 @@ public class FaceRedBlood2 extends FaceFilter{
                   if (maskGray!=0){
                       totalCount++;
                       int r =  operateByte[index]&0xff;
-                      if (r<=110){
+                      if (r<=100){
                           count++;
                       }
                   }else {

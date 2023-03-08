@@ -88,7 +88,7 @@ public class FaceNearRedLight extends FaceFilter{
                 int maskGray = maskP[w] & 0xff;
                 if (maskGray!=0){
                     int r = rgbMat[index] & 0xff;
-                    if (r<=110){
+                    if (r<=100){
                         //r值越小越红
                         count++;
                     }

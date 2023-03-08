@@ -83,26 +83,26 @@ public class FaceHydrationStatus extends FaceFilter{
 
                 //获取记录的皮肤区域大小
                 float skinArea = FaceSkinUtils.getSkinArea();
-                LogUtils.e(skinArea);
+                //LogUtils.e(skinArea);
                 if (skinArea==0){
                     skinArea = count * 0.4f;
                 }
                     if (totalPercentPixels<skinArea){
                         float percent = totalPercentPixels * 100f / skinArea;
-                        LogUtils.e(percent);
+                        //LogUtils.e(percent);
                         //level1 = 50↑ level2 = 40 - 50 level3 = 25 - 40 level4 = 0 - 25
-                        if (percent>0 && percent<=25){
+                        if (percent>0 && percent<=10){
                             //35-40
-                            score = ((percent / 25f) * 10f)  + 35f;
-                        }else if (percent>25 && percent<=40){
+                            score = ((percent / 10f) * 20f)  + 20f;
+                        }else if (percent>10 && percent<=30){
                             //45-60
-                            score = (((percent-25f) / 15f) * 15f)  + 45f;
-                        }else if (percent>40 && percent<=50){
+                            score = (((percent-10f) / 20f) * 20f)  + 40f;
+                        }else if (percent>30 && percent<=50){
                             //60-65
-                            score = (((percent-40f) / 10f) * 5f)  + 60f;
+                            score = (((percent-30f) / 20f) * 10f)  + 60f;
                         }else if (percent>50 &&percent<=100){
                             //65-85
-                            score = (((percent - 50f) / 50f) * 20f)  + 65f;
+                            score = (((percent - 50f) / 50f) * 15f)  + 70f;
                         }
                     }else score = 65f;
 

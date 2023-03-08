@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Environment;
 
 import com.blankj.utilcode.util.ImageUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 
 import org.opencv.android.Utils;
@@ -64,6 +65,7 @@ public class FaceSkinUtils {
          }
          //ImageUtils.save(copy, Environment.getExternalStorageDirectory().getPath() + "/test/a.jpg", Bitmap.CompressFormat.JPEG);
          if (!copy.isRecycled())copy.recycle();
+//         LogUtils.e("save"+skinArea);
          SPUtils.getInstance().put(FilterCacheConfig.CACHE_FACE_SKIN_AREA,skinArea);
       }
    }

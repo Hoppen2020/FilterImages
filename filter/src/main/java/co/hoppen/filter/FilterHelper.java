@@ -2,6 +2,7 @@ package co.hoppen.filter;
 
 import android.graphics.Bitmap;
 
+import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ThreadUtils;
@@ -71,6 +72,7 @@ public class FilterHelper {
                 if (filter instanceof FaceFilter){ //人脸算法
                     //人脸区域定位
                     boolean finish = ((FaceFilter) filter).faceAreaPositioning(createAnalyzer());
+                    LogUtils.e(finish);
                     if (finish)filter.onFilter(filterInfoResult);
                 }else { //局部算法
                     filter.onFilter(filterInfoResult);
@@ -149,7 +151,11 @@ public class FilterHelper {
                 @Override
                 public void onSuccess(List<MLFace> mlFaces) {
                     if (onDetectFaceListener!=null && mlFaces.size()==1){
-                        if (rgbLight)FaceSkinUtils.saveFaceSkinArea(bitmap);
+                        if (rgbLight){
+                            FaceSkinUtils.saveFaceSkinArea(bitmap);
+                            String face = GsonUtils.toJson(mlFaces.get(0));
+                            SPUtils.getInstance().put(FilterCacheConfig.CACHE_FACE,face);
+                        }
                         onDetectFaceListener.onDetectSuccess();
                     }else {
                         if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();

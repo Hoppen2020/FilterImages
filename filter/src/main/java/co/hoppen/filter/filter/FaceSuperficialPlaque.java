@@ -116,27 +116,32 @@ public class FaceSuperficialPlaque extends FaceFilter {
 
 
          //0.542 0.48  0.5  0.51 0.51
-         //LogUtils.e(count, FaceSkinUtils.getSkinArea(),count / FaceSkinUtils.getSkinArea());
+       LogUtils.e(count, FaceSkinUtils.getSkinArea(),count / FaceSkinUtils.getSkinArea());
 
        float score = 85;
        float areaPercent = FaceSkinUtils.getSkinArea()>count?count * 100f /FaceSkinUtils.getSkinArea():100f;
        //level1——25~40 level2——40~50 level3——50~60 level4——60~100
+       //level1——0~5 level2——5~8 level3——8~15 level4——15~20 20~30 30~40
 
-       if (areaPercent<=25){
-           score = 85f;
-       }else if (areaPercent>25 && areaPercent<=40){
-           //70~85
-           score = ((1 - ((areaPercent-25) / 15f)) * 15f) + 70f;
-       }else if (areaPercent>40 && areaPercent<=50){
-           //60~70
-           score = ((1 - ((areaPercent-40) / 10f)) * 10) + 60f;
-       }else if (areaPercent>50 && areaPercent<=60){
-           //50~60
-           score = ((1 - ((areaPercent-50) / 10f)) * 10) + 50f;
-       }else if (areaPercent>60 && areaPercent<=90){
-           //40~50
-           score = ((1 - ((areaPercent-60) / 30f)) * 10) + 40f;
-       }else {
+       if (areaPercent<=5){
+           //75~85
+           score = ((1 - (areaPercent / 5)) * 10f) + 75f;
+       }else if (areaPercent>5 && areaPercent<=8){
+           //65~75
+           score = ((1 - ((areaPercent-5) / 3f)) * 10f) + 65f;
+       }else if (areaPercent>8 && areaPercent<=15){
+           //55~65
+           score = ((1 - ((areaPercent- 8) / 7f)) * 10) + 55f;
+       }else if (areaPercent>15 && areaPercent<=20){
+           //45~55
+           score = ((1 - ((areaPercent-15f) / 5f)) * 10) + 45f;
+       }else if (areaPercent>20 && areaPercent<=30){
+           //35~45
+           score = ((1 - ((areaPercent-20f) / 10f)) * 10) + 35f;
+       }else if (areaPercent>30 && areaPercent<=40){
+           //25~35
+           score = ((1 - ((areaPercent-30) / 10f)) * 10) + 25f;
+       } else {
            score = 20f;
        }
 

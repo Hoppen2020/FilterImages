@@ -60,6 +60,7 @@ public abstract class FaceFilter extends Filter{
             MLFace faceResult = null;
             MLFrame frame = MLFrame.fromBitmap(oriBitmap);
             SparseArray<MLFace> mlFaceSparseArray = analyzer.analyseFrame(frame);
+            LogUtils.e(mlFaceSparseArray.size());
             if (mlFaceSparseArray.size()>0){
                 faceResult = mlFaceSparseArray.get(0);
                 //记录定位数据
@@ -78,6 +79,7 @@ public abstract class FaceFilter extends Filter{
                 return true;
             }
         } catch (Exception e) {
+            LogUtils.e(e.toString());
             e.printStackTrace();
         }
         return false;
