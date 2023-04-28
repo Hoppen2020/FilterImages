@@ -6,6 +6,7 @@ import co.hoppen.filter.filter.FaceAcne;
 import co.hoppen.filter.filter.FaceBlackHeads;
 import co.hoppen.filter.filter.FaceBrownArea2;
 import co.hoppen.filter.filter.FaceDarkCircles;
+import co.hoppen.filter.filter.FaceDarkCircles2;
 import co.hoppen.filter.filter.FaceEpidermisSpots;
 import co.hoppen.filter.filter.FaceFollicleCleanDegree;
 import co.hoppen.filter.filter.FaceHornyPlug;
@@ -15,8 +16,11 @@ import co.hoppen.filter.filter.FaceOilSecretion;
 import co.hoppen.filter.filter.FacePorphyrin;
 import co.hoppen.filter.filter.FaceRedBlock;
 import co.hoppen.filter.filter.FaceRedBlood2;
+import co.hoppen.filter.filter.FaceRedBlood3;
 import co.hoppen.filter.filter.FaceSkinVeins3;
 import co.hoppen.filter.filter.FaceSuperficialPlaque;
+import co.hoppen.filter.filter.FaceSuperficialPlaque2;
+import co.hoppen.filter.filter.FaceSuperficialPlaque3;
 import co.hoppen.filter.filter.FaceTest;
 import co.hoppen.filter.filter.FaceUvSpot;
 import co.hoppen.filter.filter.FaceWrinkle;
@@ -59,7 +63,7 @@ public enum FilterType {
     FACE_SKIN_VEINS(FaceSkinVeins3.class),
     //--------------眼圈---------------------
     //全脸——黑眼圈（RGB）
-    FACE_DARK_CIRCLES(FaceDarkCircles.class),
+    FACE_DARK_CIRCLES(FaceDarkCircles2.class),
     //--------------毛囊---------------------
     //全脸——毛孔
     FACE_FOLLICLE_CLEAN_DEGREE(FaceFollicleCleanDegree.class),
@@ -83,7 +87,7 @@ public enum FilterType {
     //全脸——表层斑(RGB)
     FACE_EPIDERMIS_SPOTS(FaceEpidermisSpots.class),
     //全脸——色素沉着（交叉pl）
-    FACE_SUPERFICIAL_PLAQUE(FaceSuperficialPlaque.class),
+    FACE_SUPERFICIAL_PLAQUE(FaceSuperficialPlaque3.class),
     //棕色区
     FACE_BROWN_AREA(FaceBrownArea2.class),
     //紫外线斑

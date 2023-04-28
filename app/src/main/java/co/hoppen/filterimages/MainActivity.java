@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
       filterView = findViewById(R.id.iv_filter);
       Bitmap firstBitmap = getImageFromAssetsFile("1.jpg");
 
-      Bitmap imageFromAssetsFile = getImageFromAssetsFile("2.jpg");
+      Bitmap imageFromAssetsFile = getImageFromAssetsFile("11111.jpg");
       oriView.setImageBitmap(imageFromAssetsFile);
 
       File file = new File(Environment.getExternalStorageDirectory().getPath() + "/test");
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDetectSuccess() {
                try {
-                  filterHelper.execute(FilterType.FACE_NEAR_RED_LIGHT, imageFromAssetsFile, 0, file.getPath() + "/1.jpg", new OnFilterListener() {
+                  filterHelper.execute(FilterType.FACE_DARK_CIRCLES, imageFromAssetsFile, 0, file.getPath() + "/1.jpg", new OnFilterListener() {
                      @Override
                      public void onFilter(FilterInfoResult filterInfoResult) {
                         LogUtils.e(filterInfoResult.toString());

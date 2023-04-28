@@ -74,7 +74,16 @@ public class FaceHydrationStatus extends FaceFilter{
 
                     }else if (gray>=150){
                         totalPercentPixels++;
-                        filterPixels[i]=0X801259FF;
+//                        filterPixels[i]=0X801259FF;
+
+                        int originalPixel = originalPixels[i];
+                        int R = Color.red(originalPixel);
+                        int G = Color.green(originalPixel);
+                        int B = Color.blue(originalPixel);
+
+                        B = B + 50;//80-50-30
+                        filterPixels[i] = Color.rgb(R,G,clamp(B));
+
                         areaPixels[i] = Color.WHITE;
                     }
                 }

@@ -145,21 +145,25 @@ public class CutoutUtils {
     }
 
     private static void cutoutEyeBottom(MLFace face, Canvas canvas, Paint paint) {
-        Path left = pathMoveTo(face.getAllPoints().get(845));
-        float quadToX = (face.getAllPoints().get(845).getX() + face.getAllPoints().get(846).getX()) / 2 ;
-        float quadToY = face.getAllPoints().get(288).getY();//284
-        pathQuadTo(left,quadToX,quadToY,face.getAllPoints().get(846));
-        left.close();
 
-        Path right = pathMoveTo(face.getAllPoints().get(847));
-        quadToX = (face.getAllPoints().get(847).getX() + face.getAllPoints().get(848).getX()) / 2 ;
-        quadToY = face.getAllPoints().get(352).getY();//348
-        pathQuadTo(right,quadToX,quadToY,face.getAllPoints().get(848));
-        right.close();
+        MLPosition left1P = face.getAllPoints().get(845);
+        MLPosition left2P = face.getAllPoints().get(846);
+        float leftCenterX = (left1P.getX()+left2P.getX()) / 2;
+        float leftCenterY = (left1P.getY() + left2P.getY())/ 2;
+        float leftRadius = Math.abs(left2P.getX()-left1P.getX()) * 0.6f;
+
+        MLPosition right1P = face.getAllPoints().get(847);
+        MLPosition right2P = face.getAllPoints().get(848);
+        float rightCenterX = (right1P.getX()+right2P.getX()) / 2;
+        float rightCenterY = (right1P.getY() + right2P.getY())/ 2;
+        float rightRadius = Math.abs(right2P.getX()-right1P.getX()) * 0.6f;
+
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
-        canvas.drawPath(left,paint);
-        canvas.drawPath(right,paint);
+
+        canvas.drawCircle(leftCenterX,leftCenterY,leftRadius,paint);
+        canvas.drawCircle(rightCenterX,rightCenterY,rightRadius,paint);
+
     }
 
     private static void cutoutMiddle(MLFace face, Canvas canvas, Paint paint) {
@@ -189,11 +193,11 @@ public class CutoutUtils {
         foreheadRectF.left = face.getAllPoints().get(240).getX();
         foreheadRectF.top = face.getAllPoints().get(200).getY();
         foreheadRectF.right = face.getAllPoints().get(158).getX();
-        foreheadRectF.bottom = face.getAllPoints().get(399).getY();
+        foreheadRectF.bottom = face.getAllPoints().get(403).getY();//399
         Bitmap tNose = BitmapUtils.getImageFromAssetsFile("TNose+.png");
         RectF noseRectF = new RectF();
         noseRectF.left = face.getAllPoints().get(312).getX();
-        noseRectF.top = face.getAllPoints().get(401).getY();
+        noseRectF.top = face.getAllPoints().get(399).getY();//401
         noseRectF.right = face.getAllPoints().get(376).getX();
         noseRectF.bottom = face.getAllPoints().get(455).getY();
         canvas.drawBitmap(tForehead,null,foreheadRectF,paint);

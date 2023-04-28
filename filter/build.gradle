@@ -36,15 +36,19 @@ dependencies {
     implementation project(path: ':opcnvc460')
 
     // 引入基础SDK
-    implementation 'com.huawei.hms:ml-computer-vision-face:3.5.0.302'
+    implementation 'com.huawei.hms:ml-computer-vision-face:3.7.0.301'
     // 引入人脸轮廓+关键点检测模型包
-    implementation 'com.huawei.hms:ml-computer-vision-face-shape-point-model:3.5.0.302'
+    implementation 'com.huawei.hms:ml-computer-vision-face-shape-point-model:3.7.0.301'
     // 引入表情检测模型包
-    implementation 'com.huawei.hms:ml-computer-vision-face-emotion-model:3.5.0.302'
+    implementation 'com.huawei.hms:ml-computer-vision-face-emotion-model:3.7.0.301'
     // 引入特征检测模型包
-    implementation 'com.huawei.hms:ml-computer-vision-face-feature-model:3.5.0.302'
+    implementation 'com.huawei.hms:ml-computer-vision-face-feature-model:3.7.0.301'
     // 引入3d检测模型包
-    implementation 'com.huawei.hms:ml-computer-vision-face-3d-model:3.5.0.302'
+    implementation 'com.huawei.hms:ml-computer-vision-face-3d-model:3.7.0.301'
+
+    implementation 'com.huawei.hms:ml-computer-vision-faceverify:3.6.0.304'
+    
+    implementation 'com.huawei.hms:ml-computer-vision-faceverify-model:3.6.0.304'
 
     implementation 'com.blankj:utilcodex:1.31.0'
 

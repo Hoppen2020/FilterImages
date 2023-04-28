@@ -13,6 +13,9 @@ import com.huawei.hms.mlsdk.common.MLFrame;
 import com.huawei.hms.mlsdk.face.MLFace;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzer;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting;
+import com.huawei.hms.mlsdk.faceverify.MLFaceTemplateResult;
+import com.huawei.hms.mlsdk.faceverify.MLFaceVerificationAnalyzer;
+import com.huawei.hms.mlsdk.faceverify.MLFaceVerificationAnalyzerFactory;
 
 import org.opencv.android.OpenCVLoader;
 
@@ -167,6 +170,14 @@ public class FilterHelper {
                     if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();
                 }
             });
+
+//            MLFaceVerificationAnalyzer verificationAnalyzer = MLFaceVerificationAnalyzerFactory.getInstance().getFaceVerificationAnalyzer();
+//            List<MLFaceTemplateResult> mlFaceTemplateResults = verificationAnalyzer.setTemplateFace(frame);
+//            for (int i = 0; i < mlFaceTemplateResults.size(); i++) {
+//                MLFaceTemplateResult mlFaceTemplateResult = mlFaceTemplateResults.get(i);
+//                LogUtils.e(mlFaceTemplateResult.getFaceInfo(),mlFaceTemplateResult.getTemplateId());
+//            }
+
         } catch (Exception e) {
             if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();
             e.printStackTrace();

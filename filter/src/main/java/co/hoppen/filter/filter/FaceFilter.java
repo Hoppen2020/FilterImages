@@ -238,4 +238,7 @@ public abstract class FaceFilter extends Filter{
         return FaceAreaInfo.createFaceAreaInfo(createPointList,width,height);
     }
 
+    public int clamp(int value) {
+        return Math.max(0, Math.min(255, value));
+    }
 }

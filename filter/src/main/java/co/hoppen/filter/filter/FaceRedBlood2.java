@@ -49,6 +49,7 @@ public class FaceRedBlood2 extends FaceFilter{
           Imgproc.equalizeHist(splitList.get(1),splitList.get(1));
 //          Imgproc.equalizeHist(splitList.get(2),splitList.get(2));
 
+          //直方图均衡化
           CLAHE clahe = Imgproc.createCLAHE(2, new Size(8, 8));
           clahe.apply(splitList.get(1),splitList.get(1));
 
@@ -72,7 +73,7 @@ public class FaceRedBlood2 extends FaceFilter{
                   int maskGray = maskByte[w] & 0xff;
                   if (maskGray!=0){
                       totalCount++;
-                      int r =  operateByte[index]&0xff;
+                      int r = operateByte[index]&0xff;
                       if (r<=100){
                           count++;
                       }

@@ -83,11 +83,12 @@ public class FaceOilSecretion extends FaceFilter{
                     int color = Color.rgb(r,g,b);
                     if (color==Color.BLACK) {
                         dst[i] = 0x00FFFFFF;
-                        continue;
+//                        continue;
                     }else {
                         int gray = (int) (r * 0.3 + g * 0.59 + b * 0.11);
                         if (gray>avgGray){
-                            dst[i] = Color.parseColor("#ffff00");
+                            dst[i] = Color.rgb(clamp(r+50),clamp(g+50),b);
+//                            dst[i] = Color.parseColor("#ffff00");
                             area[i] = Color.WHITE;
                             areaCount++;
                         }else {

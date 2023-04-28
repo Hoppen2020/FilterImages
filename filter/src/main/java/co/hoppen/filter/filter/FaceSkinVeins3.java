@@ -87,6 +87,11 @@ public class FaceSkinVeins3 extends FaceFilter{
                 //areaPixels[i] = Color.WHITE; 区域颜色
                 for (int i = 0; i < partPixels.length; i++) {
                     int oriPixel = partPixels[i];
+
+                    int R = Color.red(oriPixel);
+                    int G = Color.green(oriPixel);
+                    int B = Color.blue(oriPixel);
+
                     if (Color.alpha(oriPixel)!=0){
                         int mixPixel = mixPixels[i];
                         if (mixPixel==Color.WHITE){
@@ -100,7 +105,8 @@ public class FaceSkinVeins3 extends FaceFilter{
 //                                    minL = gray;
 //                                }
                                 hsl[1] = gray / 255f;
-                                color = ColorUtils.HSLToColor(hsl);
+                                //color = ColorUtils.HSLToColor(hsl);
+                                //color = Color.rgb(clamp(R+10),clamp(G+10),B);
                                 areaPixels[i] = Color.WHITE;
                                 valleyCount ++;
                             }else color = oriPixels[i];
@@ -115,7 +121,8 @@ public class FaceSkinVeins3 extends FaceFilter{
                                 hsl[1] = gray / 255f;
                                 if (hsl[1]>=0.3){
                                     //峰
-                                    color = ColorUtils.HSLToColor(hsl);
+                                    color = Color.rgb(R,G,clamp(B+80));
+                                    //color = ColorUtils.HSLToColor(hsl);
                                     areaPixels[i] = Color.WHITE;
                                     peakCount++;
 //                                    if (maxL<gray){
@@ -191,6 +198,8 @@ public class FaceSkinVeins3 extends FaceFilter{
     public FilterDataType getFilterDataType() {
         return FilterDataType.AREA;
     }
+
+
 
 //    @Override
 //    public FaceAreaInfo createAreaBitmap(Object... obj) {

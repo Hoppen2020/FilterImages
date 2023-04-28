@@ -42,7 +42,7 @@ public class FaceDarkCircles extends FaceFilter {
             Utils.bitmapToMat(filterBitmap,oriMat);
 
             Imgproc.cvtColor(filterMat,filterMat,Imgproc.COLOR_RGB2HSV);
-            Imgproc.cvtColor(filterMat,filterMat,Imgproc.COLOR_RGB2HSV);
+            //Imgproc.cvtColor(filterMat,filterMat,Imgproc.COLOR_RGB2HSV);
 
             Mat dst = new Mat();
 
