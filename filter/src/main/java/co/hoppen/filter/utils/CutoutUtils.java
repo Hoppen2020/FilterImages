@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 
 import com.blankj.utilcode.util.ArrayUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.huawei.hms.mlsdk.common.MLPosition;
 import com.huawei.hms.mlsdk.face.MLFace;
 
@@ -144,25 +145,55 @@ public class CutoutUtils {
         canvas.drawBitmap(facePartRight,null,facePartRightRectF,paint);
     }
 
-    private static void cutoutEyeBottom(MLFace face, Canvas canvas, Paint paint) {
+    private static void cutoutEyeBottom(MLFace face, Canvas canvas, Paint paint,int oriWidth) {
 
         MLPosition left1P = face.getAllPoints().get(845);
         MLPosition left2P = face.getAllPoints().get(846);
         float leftCenterX = (left1P.getX()+left2P.getX()) / 2;
         float leftCenterY = (left1P.getY() + left2P.getY())/ 2;
-        float leftRadius = Math.abs(left2P.getX()-left1P.getX()) * 0.6f;
+        float leftRadius = Math.abs(left2P.getX()-left1P.getX()) * 0.5f;
 
         MLPosition right1P = face.getAllPoints().get(847);
         MLPosition right2P = face.getAllPoints().get(848);
         float rightCenterX = (right1P.getX()+right2P.getX()) / 2;
         float rightCenterY = (right1P.getY() + right2P.getY())/ 2;
-        float rightRadius = Math.abs(right2P.getX()-right1P.getX()) * 0.6f;
+        float rightRadius = Math.abs(right2P.getX()-right1P.getX()) * 0.5f;
+
+        float leftRect1 = left1P.getX();
+        float rightRect1 = left2P.getX() + leftRadius * 0.3f;
+        float topRect1 = leftCenterY - leftRadius;//face.getAllPoints().get(252).getY();//leftCenterY - leftRadius;
+        float bottomRect1 = face.getAllPoints().get(297).getY();
+
+        float leftWidth = leftRadius * 0.8f;
+        leftRect1 = leftRect1 - leftWidth<0?0:leftRect1 - leftWidth;
+
+        float leftRect2 = right1P.getX() - rightRadius * 0.3f;
+        float rightRect2 = right2P.getX();
+        float topRect2 = rightCenterY - rightRadius;//face.getAllPoints().get(146).getY();//rightCenterY - rightRadius;
+        float bottomRect2 = face.getAllPoints().get(361).getY();
+
+        float rightWidth = rightRadius * 0.8f;
+        rightRect2 = Math.min(rightRect2 + rightWidth, oriWidth);
 
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.FILL);
 
-        canvas.drawCircle(leftCenterX,leftCenterY,leftRadius,paint);
-        canvas.drawCircle(rightCenterX,rightCenterY,rightRadius,paint);
+        canvas.drawOval(leftRect1,topRect1,rightRect1,bottomRect1,paint);
+        canvas.drawOval(leftRect2,topRect2,rightRect2,bottomRect2,paint);
+//        canvas.drawCircle(leftCenterX,leftCenterY,leftRadius,paint);
+//        canvas.drawCircle(rightCenterX,rightCenterY,rightRadius,paint);
+
+
+    }
+
+    private static void cutoutEyeBottom(MLFace face, Canvas canvas, Paint paint) {
+        RectF eyeRectF = new RectF();
+        eyeRectF.left = face.getAllPoints().get(254).getX();
+        eyeRectF.top = face.getAllPoints().get(251).getY();
+        eyeRectF.right = face.getAllPoints().get(144).getX();
+        eyeRectF.bottom = face.getAllPoints().get(132).getY();
+//        canvas.drawBitmap(middle,null,eyeRectF,paint);
+        canvas.drawRect(eyeRectF,paint);
 
     }
 

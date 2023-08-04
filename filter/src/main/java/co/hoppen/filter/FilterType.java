@@ -7,6 +7,9 @@ import co.hoppen.filter.filter.FaceBlackHeads;
 import co.hoppen.filter.filter.FaceBrownArea2;
 import co.hoppen.filter.filter.FaceDarkCircles;
 import co.hoppen.filter.filter.FaceDarkCircles2;
+import co.hoppen.filter.filter.FaceDarkCircles3;
+import co.hoppen.filter.filter.FaceDarkCircles4;
+import co.hoppen.filter.filter.FaceDarkCircles5;
 import co.hoppen.filter.filter.FaceEpidermisSpots;
 import co.hoppen.filter.filter.FaceFollicleCleanDegree;
 import co.hoppen.filter.filter.FaceHornyPlug;
@@ -63,7 +66,7 @@ public enum FilterType {
     FACE_SKIN_VEINS(FaceSkinVeins3.class),
     //--------------眼圈---------------------
     //全脸——黑眼圈（RGB）
-    FACE_DARK_CIRCLES(FaceDarkCircles2.class),
+    FACE_DARK_CIRCLES(FaceDarkCircles4.class),
     //--------------毛囊---------------------
     //全脸——毛孔
     FACE_FOLLICLE_CLEAN_DEGREE(FaceFollicleCleanDegree.class),
