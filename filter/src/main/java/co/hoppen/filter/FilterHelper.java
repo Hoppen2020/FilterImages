@@ -13,9 +13,6 @@ import com.huawei.hms.mlsdk.common.MLFrame;
 import com.huawei.hms.mlsdk.face.MLFace;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzer;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting;
-import com.huawei.hms.mlsdk.faceverify.MLFaceTemplateResult;
-import com.huawei.hms.mlsdk.faceverify.MLFaceVerificationAnalyzer;
-import com.huawei.hms.mlsdk.faceverify.MLFaceVerificationAnalyzerFactory;
 
 import org.opencv.android.OpenCVLoader;
 
@@ -25,6 +22,7 @@ import java.util.List;
 import co.hoppen.filter.filter.FaceFilter;
 import co.hoppen.filter.filter.Filter;
 import co.hoppen.filter.utils.FaceSkinUtils;
+import co.hoppen.filter.utils.FaceUtils;
 
 /**
  * Created by YangJianHui on 2021/9/11.
@@ -75,7 +73,7 @@ public class FilterHelper {
                 if (filter instanceof FaceFilter){ //人脸算法
                     //人脸区域定位
                     boolean finish = ((FaceFilter) filter).faceAreaPositioning(createAnalyzer());
-                    LogUtils.e(finish);
+                    //LogUtils.e(finish);
                     if (finish)filter.onFilter(filterInfoResult);
                 }else { //局部算法
                     filter.onFilter(filterInfoResult);
@@ -159,7 +157,7 @@ public class FilterHelper {
                             String face = GsonUtils.toJson(mlFaces.get(0));
                             SPUtils.getInstance().put(FilterCacheConfig.CACHE_FACE,face);
                         }
-                        onDetectFaceListener.onDetectSuccess();
+                        onDetectFaceListener.onDetectSuccess(FaceUtils.faceToPartPoint(mlFaces.get(0)));
                     }else {
                         if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();
                     }

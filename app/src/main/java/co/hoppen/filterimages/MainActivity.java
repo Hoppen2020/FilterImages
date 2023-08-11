@@ -4,6 +4,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +21,7 @@ import com.blankj.utilcode.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import co.hoppen.filter.FilterHelper;
 import co.hoppen.filter.FilterInfoResult;
@@ -55,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
 
          filterHelper.detectFace(firstBitmap, true, new OnDetectFaceListener() {
             @Override
-            public void onDetectSuccess() {
+            public void onDetectSuccess(List<PointF> partPoint) {
                try {
+                  LogUtils.e(partPoint.toString());
                   filterHelper.execute(FilterType.FACE_RED_BLOOD, imageFromAssetsFile, 0, file.getPath() + "/1.jpg", new OnFilterListener() {
                      @Override
                      public void onFilter(FilterInfoResult filterInfoResult) {
