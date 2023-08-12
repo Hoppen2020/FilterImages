@@ -26,7 +26,7 @@ public class FaceUtils {
       pointFList.add(new PointF(leftFaceX,leftFaceY));
 
       float rightFaceX = (allPoints.get(357).getX() + allPoints.get(117).getX()) / 2;
-      float rightFaceY = (allPoints.get(854).getY() + allPoints.get(848).getY() / 2);
+      float rightFaceY = (allPoints.get(854).getY() + allPoints.get(848).getY()) / 2;
       pointFList.add(new PointF(rightFaceX,rightFaceY));
 
       float noseX = allPoints.get(440).getX();
