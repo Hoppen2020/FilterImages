@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.RectF;
 
 import com.blankj.utilcode.util.ArrayUtils;
@@ -89,6 +90,31 @@ public class CutoutUtils {
             }
         }
         canvasBitmap.setPixels(resultPixels,0,width, 0, 0, width, height);
+        return canvasBitmap;
+    }
+
+
+    public static Bitmap cutoutMouth(Bitmap src, List<PointF> pointFs){
+        Bitmap canvasBitmap = Bitmap.createBitmap(src.getWidth(),src.getHeight(),src.getConfig());
+        Canvas canvas = new Canvas(canvasBitmap);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setFilterBitmap(true);
+        paint.setDither(true);
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        Path path = null;
+        for (int i = 0; i < pointFs.size(); i++) {
+            PointF pointF =  pointFs.get(i);
+            if (path == null){
+                path = new Path();
+                path.moveTo(pointF.x,pointF.y);
+            }else {
+                path.lineTo(pointF.x,pointF.y);
+            }
+        }
+        path.close();
+        canvas.drawPath(path,paint);
         return canvasBitmap;
     }
 

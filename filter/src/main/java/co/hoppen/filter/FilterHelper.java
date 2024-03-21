@@ -60,6 +60,16 @@ public class FilterHelper {
         }
     }
 
+    public void execute(FilterType type, Bitmap bitmap,OnFilterListener onFilterListener)throws Exception{
+        try {
+            executeResult(createFilter(type, bitmap, 0),new FilterInfoResult(type,"",0),onFilterListener);
+        } catch (Exception e) {
+            LogUtils.e(e.toString());
+            e.printStackTrace();
+        }
+    }
+
+
     /**
      *异步执行算法
      * @param filter

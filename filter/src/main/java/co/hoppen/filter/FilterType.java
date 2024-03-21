@@ -5,11 +5,7 @@ import co.hoppen.filter.filter.ElasticFiberStatus;
 import co.hoppen.filter.filter.FaceAcne;
 import co.hoppen.filter.filter.FaceBlackHeads;
 import co.hoppen.filter.filter.FaceBrownArea2;
-import co.hoppen.filter.filter.FaceDarkCircles;
-import co.hoppen.filter.filter.FaceDarkCircles2;
-import co.hoppen.filter.filter.FaceDarkCircles3;
 import co.hoppen.filter.filter.FaceDarkCircles4;
-import co.hoppen.filter.filter.FaceDarkCircles5;
 import co.hoppen.filter.filter.FaceEpidermisSpots;
 import co.hoppen.filter.filter.FaceFollicleCleanDegree;
 import co.hoppen.filter.filter.FaceHornyPlug;
@@ -18,19 +14,16 @@ import co.hoppen.filter.filter.FaceNearRedLight;
 import co.hoppen.filter.filter.FaceOilSecretion;
 import co.hoppen.filter.filter.FacePorphyrin;
 import co.hoppen.filter.filter.FaceRedBlock;
-import co.hoppen.filter.filter.FaceRedBlood2;
-import co.hoppen.filter.filter.FaceRedBlood3;
+import co.hoppen.filter.filter.FaceRedBlood5;
 import co.hoppen.filter.filter.FaceSkinVeins3;
-import co.hoppen.filter.filter.FaceSuperficialPlaque;
-import co.hoppen.filter.filter.FaceSuperficialPlaque2;
 import co.hoppen.filter.filter.FaceSuperficialPlaque3;
 import co.hoppen.filter.filter.FaceTest;
 import co.hoppen.filter.filter.FaceUvSpot;
-import co.hoppen.filter.filter.FaceWrinkle;
-import co.hoppen.filter.filter.FaceWrinkle8;
-import co.hoppen.filter.filter.FaceWrinkle9;
+import co.hoppen.filter.filter.FaceWrinkle3;
 import co.hoppen.filter.filter.Filter;
 import co.hoppen.filter.filter.FollicleCleanDegree;
+import co.hoppen.filter.filter.HairDensity;
+import co.hoppen.filter.filter.HairThickness;
 import co.hoppen.filter.filter.SkinHydrationStatus;
 import co.hoppen.filter.filter.SkinOilSecretion;
 import co.hoppen.filter.filter.SkinPigmentStatus;
@@ -42,6 +35,10 @@ import co.hoppen.filter.filter.TestFilter;
  * Created by YangJianHui on 2021/9/10.
  */
 public enum FilterType {
+
+    HAIR_DENSITY(HairDensity.class),
+    HAIR_THICKNESS(HairThickness.class),
+
     SKIN_HYDRATION_STATUS(SkinHydrationStatus.class),
     SKIN_OIL_SECRETION(SkinOilSecretion.class),
     SKIN_PIGMENT_STATUS(SkinPigmentStatus.class),
@@ -61,7 +58,7 @@ public enum FilterType {
     FACE_OIL_SECRETION(FaceOilSecretion.class),
     //--------------皱纹---------------------
     //全脸——皱纹
-    FACE_WRINKLE(FaceWrinkle.class),
+    FACE_WRINKLE(FaceWrinkle3.class),//FaceWrinkle.class
     //全脸——皮肤纹理
     FACE_SKIN_VEINS(FaceSkinVeins3.class),
     //--------------眼圈---------------------
@@ -81,7 +78,7 @@ public enum FilterType {
     FACE_PORPHYRIN(FacePorphyrin.class),
     //--------------敏感---------------------
     //全脸——红血丝(交叉PL)×分数
-    FACE_RED_BLOOD(FaceRedBlood2.class),
+    FACE_RED_BLOOD(FaceRedBlood5.class),//FaceRedBlood2.class
     //全脸——敏感(交叉PL)
     FACE_NEAR_RED_LIGHT(FaceNearRedLight.class),
     //红色区

@@ -26,6 +26,8 @@ public class FilterInfoResult {
 
     private Status status = Status.NOT_CONVERTED;
 
+    private Bitmap hairFilterBitmap;
+
     public FilterInfoResult(String filterImagePath){
         this.filterImagePath = filterImagePath;
     }
@@ -46,6 +48,14 @@ public class FilterInfoResult {
 //            LogUtils.e("filter_save: "+save+"  "+filterImagePath);
             if (filterBitmap!=null&&!filterBitmap.isRecycled())filterBitmap.recycle();
         }
+    }
+
+    public void setHairFilterBitmap(Bitmap filterBitmap){
+        hairFilterBitmap = filterBitmap;
+    }
+
+    public Bitmap getHairFilterBitmap() {
+        return hairFilterBitmap;
     }
 
     public FaceAreaInfo getFaceAreaInfo() {

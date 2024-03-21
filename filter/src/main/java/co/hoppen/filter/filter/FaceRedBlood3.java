@@ -5,37 +5,18 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.LogUtils;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
-import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfKeyPoint;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.features2d.SimpleBlobDetector;
-import org.opencv.features2d.SimpleBlobDetector_Params;
 import org.opencv.imgproc.CLAHE;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
-import org.opencv.objdetect.CascadeClassifier;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import co.hoppen.filter.FacePart;
@@ -48,92 +29,152 @@ import co.hoppen.filter.FilterInfoResult;
 public class FaceRedBlood3 extends FaceFilter{
 
 
-   @RequiresApi(api = Build.VERSION_CODES.N)
-   @Override
-   public void onFilter(FilterInfoResult filterInfoResult) {
-       Mat srcMat = new Mat();
-       Utils.bitmapToMat(getOriginalImage(),srcMat);
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onFilter(FilterInfoResult filterInfoResult) {
+        Mat operateMat = new Mat();
+        Utils.bitmapToMat(getOriginalImage(),operateMat);
 
-       // 将图像转换到HSV空间
-       Mat hsvMat = new Mat(srcMat.size(), CvType.CV_8UC3, new Scalar(0));
-       Imgproc.cvtColor(srcMat, hsvMat, Imgproc.COLOR_RGB2HSV);
+//          Mat grayMat = new Mat();
+//          Imgproc.cvtColor(operateMat,grayMat,Imgproc.COLOR_RGB2GRAY);
 
-       // 定义浅红色范围
-       Scalar lowerRed = new Scalar(0, 50, 50);
-       Scalar upperRed = new Scalar(8, 255, 255);
+//          CLAHE clahe = Imgproc.createCLAHE(2, new Size(8, 8));
+//          clahe.apply(grayMat,grayMat);
+//
+//          Imgproc.cvtColor(grayMat,operateMat,Imgproc.COLOR_GRAY2RGB);
+        Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_RGB2HSV);
+        List<Mat> splitList = new ArrayList<>();
+        Core.split(operateMat,splitList);
 
-       // 创建二值图像来分割出浅红色部分
-       Mat redMask = new Mat();
-       Core.inRange(hsvMat, lowerRed, upperRed, redMask);
+        byte [] hBytes = new byte[splitList.get(0).channels() * splitList.get(0).cols()];
+        byte [] sBytes = new byte[splitList.get(1).channels() * splitList.get(1).cols()];
+        byte [] vBytes = new byte[splitList.get(2).channels() * splitList.get(2).cols()];
 
-       // 进行形态学处理以去除噪声并填补空洞
-       Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(5, 5));
-       Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_OPEN, kernel);
-       Imgproc.morphologyEx(redMask, redMask, Imgproc.MORPH_CLOSE, kernel);
+//        List<Integer> hlist = new ArrayList<>();
+//        List<Integer> slist = new ArrayList<>();
 
-       // 在浅红色区域深化颜色以突出显示红血丝
-       Mat redMaskCopy = redMask.clone();
-       for (int r = 0; r < redMask.rows(); r++) {
-           for (int c = 0; c < redMask.cols(); c++) {
-               if (redMask.get(r, c)[0] == 255) {
-                   hsvMat.get(r, c)[2] += 50;  // V value
-               }
-           }
-       }
-       // 将颜色重新转换为BGR空间，以便在原始图像上显示结果
-       Mat resultMat = new Mat(hsvMat.size(), hsvMat.type());
-       Imgproc.cvtColor(hsvMat, resultMat, Imgproc.COLOR_HSV2RGB);
-       Core.bitwise_and(resultMat, resultMat, resultMat, redMaskCopy);
+        for (int h = 0; h < splitList.get(0).rows(); h++) {
+            splitList.get(0).get(h,0,hBytes);
+            splitList.get(1).get(h,0,sBytes);
+            splitList.get(2).get(h,0,vBytes);
+            for (int w = 0; w < splitList.get(0).cols(); w++) {
+                int index = splitList.get(0).channels() * w;
+                int hValue = hBytes[w] & 0xff;
+                int sValue = sBytes[w] & 0xff;
+                int vValue = sBytes[w] & 0xff;
+                if (hValue <= 10 || hValue >= 150 && hValue <= 180){ //h
+                    if (sValue>=43){ // s
+                        if (vValue>=64){ //v
+                            if (sValue>=149){
+                                sValue = (int) (sValue + (sValue * 0.4f));
+                                if (sValue>255)sValue = 255;
+                            }else {
+                                sValue  = (int) (sValue - (sValue * 0.1f));
+                                if (sValue<20){
+                                    sValue = 20;
+                                }
+                            }
+                            sBytes[index] = (byte) sValue;
+                        }
+                    }
+                }
+            }
+            splitList.get(1).put(h,0,sBytes);
+        }
 
-       //区域截取
-//       Mat maskMat = getFaceMask();
-//       byte [] maskByte = new byte[maskMat.channels() * maskMat.cols()];
-//       byte [] operateByte = new byte[operateMat.channels() * operateMat.cols()];
-//       float count = 0;
-//       float totalCount = 0;
-//       for (int h = 0; h < operateMat.rows(); h++) {
-//           operateMat.get(h,0,operateByte);
-//           maskMat.get(h,0,maskByte);
-//           for (int w = 0; w < operateMat.cols(); w++) {
-//               int index = operateMat.channels() * w;
-//               int maskGray = maskByte[w] & 0xff;
-//               if (maskGray!=0){
-//                   totalCount++;
-//                   int r = operateByte[index]&0xff;
-//                   if (r<=100){
-//                       count++;
-//                   }
-//               }else {
-//                   operateByte[index] = 0;
-//                   operateByte[index +1] = 0;
-//                   operateByte[index + 2] = 0;
-//               }
-//           }
-//           operateMat.put(h,0,operateByte);
-//       }
+        //LogUtils.e(hlist.toString(),slist.toString());
 
-       filterInfoResult.setScore(0);
-       filterInfoResult.setDataTypeString(getFilterDataType(),0d);
 
-       Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
-       Utils.matToBitmap(resultMat,resultBitmap);
+        splitList.set(0,new Mat(operateMat.size(), CvType.CV_8UC1,new Scalar(0)));
+        Imgproc.equalizeHist(splitList.get(1),splitList.get(1));
+        //Imgproc.equalizeHist(splitList.get(2),splitList.get(2));
 
-       Mat areaMat = new Mat();
-       Utils.bitmapToMat(getFaceAreaImage(),areaMat);
-       filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat,1));
+        //直方图均衡化
+        CLAHE clahe = Imgproc.createCLAHE(2, new Size(2, 2));
+        clahe.apply(splitList.get(1),splitList.get(1));
 
-       filterInfoResult.setFilterBitmap(resultBitmap);
-       filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
-   }
+        Core.merge(splitList,operateMat);
 
-   @Override
-   public FacePart[] getFacePart() {
-      return new FacePart[]{FacePart.FACE_SKIN};
-   }
+        Imgproc.cvtColor(operateMat,operateMat,Imgproc.COLOR_HSV2RGB);
 
-   @Override
-   public FilterDataType getFilterDataType() {
-      return FilterDataType.AREA;
-   }
+        Mat maskMat = getFaceMask();
+
+        byte [] maskByte = new byte[maskMat.channels() * maskMat.cols()];
+        byte [] operateByte = new byte[operateMat.channels() * operateMat.cols()];
+
+        float count = 0;
+        float totalCount = 0;
+
+        for (int h = 0; h < operateMat.rows(); h++) {
+            operateMat.get(h,0,operateByte);
+            maskMat.get(h,0,maskByte);
+            for (int w = 0; w < operateMat.cols(); w++) {
+                int index = operateMat.channels() * w;
+                int maskGray = maskByte[w] & 0xff;
+                if (maskGray!=0){
+                    totalCount++;
+                    int r = operateByte[index]&0xff;
+                    if (r<=110){
+                        count++;
+                    }
+                }else {
+                    operateByte[index] = 0;
+                    operateByte[index +1] = 0;
+                    operateByte[index + 2] = 0;
+                }
+            }
+            operateMat.put(h,0,operateByte);
+        }
+
+        float score = 85f;
+        float percent = count * 100f /totalCount;
+
+        LogUtils.e(totalCount,count,percent);
+        //70 71 29 61 80 69
+        //level1 0~30 level2 30~50 level3 50~60 level4 60~70 70~80 80~100
+        if (percent<=30){
+            //75~85
+            score = ((1-(percent / 30f)) * 10f)  + 75f;
+        }else if (percent>30 && percent<=50){
+            //65~75
+            score = ((1-((percent - 30f) / 20f)) * 10f)  + 65f;
+        }else if (percent>50 && percent<=60){
+            //55~65
+            score = ((1-((percent - 50f) / 10f)) * 10f)  + 55f;
+        }else if (percent>60 && percent<=70){
+            //45~55
+            score = ((1-((percent - 60f) / 10f)) * 10f)  + 45f;
+        }else if (percent>70 && percent<=80){
+            //35~45
+            score = ((1-((percent - 70f) / 10f)) * 10f)  + 35f;
+        }else if (percent>80 &&percent<=90){
+            //20~35
+            score = ((1-((percent - 80f) / 10f)) * 15f)  + 20f;
+        }else {
+            score = 20f;
+        }
+        filterInfoResult.setScore((int) score);
+        filterInfoResult.setDataTypeString(getFilterDataType(),(double)percent);
+
+        Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(operateMat,resultBitmap);
+
+        Mat areaMat = new Mat();
+        Utils.bitmapToMat(getFaceAreaImage(),areaMat);
+        filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat,1));
+
+        filterInfoResult.setFilterBitmap(resultBitmap);
+        filterInfoResult.setStatus(FilterInfoResult.Status.SUCCESS);
+    }
+
+    @Override
+    public FacePart[] getFacePart() {
+        return new FacePart[]{FacePart.FACE_SKIN};
+    }
+
+    @Override
+    public FilterDataType getFilterDataType() {
+        return FilterDataType.AREA;
+    }
 
 }

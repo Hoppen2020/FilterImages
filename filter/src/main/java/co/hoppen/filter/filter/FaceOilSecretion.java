@@ -106,7 +106,7 @@ public class FaceOilSecretion extends FaceFilter{
                 //level1——0~5 level2——5~10 level3——10~20 level4 20~100
                 if (areaCount<skinArea) {
                     float percent = areaCount * 100f / skinArea;
-                    if (percent>15 && percent<=100){
+                    if (percent>15 && percent<=100){//15-100   20-55
                         //20 - 40
 //                        score = ((percent / 25f) * 10f)  + 35f;
                         score = ((1-((percent - 15f) / 85f)) * 35f)  + 20f;

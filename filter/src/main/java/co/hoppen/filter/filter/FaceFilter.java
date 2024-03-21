@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PointF;
 import android.util.SparseArray;
 
 import com.blankj.utilcode.util.GsonUtils;
@@ -27,6 +28,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import co.hoppen.filter.FaceAreaInfo;
@@ -34,7 +36,11 @@ import co.hoppen.filter.FacePart;
 import co.hoppen.filter.FilterCacheConfig;
 import co.hoppen.filter.FilterDataType;
 import co.hoppen.filter.utils.CutoutUtils;
+
+import static com.huawei.hms.mlsdk.face.MLFaceShape.TYPE_BOTTOM_OF_LOWER_LIP;
+import static com.huawei.hms.mlsdk.face.MLFaceShape.TYPE_BOTTOM_OF_UPPER_LIP;
 import static com.huawei.hms.mlsdk.face.MLFaceShape.TYPE_FACE;
+import static com.huawei.hms.mlsdk.face.MLFaceShape.TYPE_TOP_OF_UPPER_LIP;
 
 /**
  * Created by YangJianHui on 2022/9/16.
@@ -44,6 +50,8 @@ public abstract class FaceFilter extends Filter{
     public abstract FacePart[] getFacePart();
 
     public abstract FilterDataType getFilterDataType();
+
+    private List<PointF> mouthPoints;
 
     //人脸定位部分关键点
     private List<MLPosition> facePoints = null;
@@ -74,6 +82,9 @@ public abstract class FaceFilter extends Filter{
             }
             analyzer.stop();
             if (faceResult!=null){
+                mouthPoints = new ArrayList<>();
+                mouthPoints.addAll(Arrays.asList(faceResult.getFaceShape(TYPE_TOP_OF_UPPER_LIP).getCoordinatePoints()));
+                mouthPoints.addAll(Arrays.asList(faceResult.getFaceShape(TYPE_BOTTOM_OF_LOWER_LIP).getCoordinatePoints()));
                 facePoints = faceResult.getFaceShape(TYPE_FACE).getPoints();
                 faceAreaImage = CutoutUtils.cutoutPart(oriBitmap,getFacePart(),faceResult);
                 return true;
@@ -83,6 +94,12 @@ public abstract class FaceFilter extends Filter{
             e.printStackTrace();
         }
         return false;
+    }
+
+    public Bitmap getMouthAreaImage(){
+        if (mouthPoints!=null){
+            return CutoutUtils.cutoutMouth(getOriginalImage(),mouthPoints);
+        }else return null;
     }
 
     public Bitmap getFaceAreaImage() {
