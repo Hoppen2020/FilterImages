@@ -1,6 +1,7 @@
 package co.hoppen.filter;
 
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 
 import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
@@ -10,14 +11,19 @@ import com.huawei.hmf.tasks.OnFailureListener;
 import com.huawei.hmf.tasks.OnSuccessListener;
 import com.huawei.hms.mlsdk.MLAnalyzerFactory;
 import com.huawei.hms.mlsdk.common.MLFrame;
+import com.huawei.hms.mlsdk.common.MLPosition;
 import com.huawei.hms.mlsdk.face.MLFace;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzer;
 import com.huawei.hms.mlsdk.face.MLFaceAnalyzerSetting;
+import com.huawei.hms.mlsdk.face.MLFaceShape;
 
 import org.opencv.android.OpenCVLoader;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import co.hoppen.filter.filter.FaceFilter;
 import co.hoppen.filter.filter.Filter;
@@ -190,6 +196,80 @@ public class FilterHelper {
             if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 单一检测返回关键点
+     */
+    public void detectFace(Bitmap src,OnDetectFacePartsListener onDetectFacePartsListener){
+        MLFaceAnalyzer analyzer = createAnalyzer();
+        MLFrame frame = MLFrame.fromBitmap(src);
+        analyzer.asyncAnalyseFrame(frame).addOnSuccessListener(new OnSuccessListener<List<MLFace>>() {
+            @Override
+            public void onSuccess(List<MLFace> mlFaces) {
+                if (onDetectFacePartsListener!=null&&mlFaces.size()==1){
+                    MLFace mlFace = mlFaces.get(0);
+                    Map<DetectFaceParts,List<PointF>> result = new HashMap<>();
+                    List<MLPosition> points = mlFace.getFaceShape(MLFaceShape.TYPE_FACE).getPoints();
+                    {
+                        List<PointF> pointFList = new ArrayList<>();
+                        for (int i = 0; i < points.size(); i++) {
+                            pointFList.add(new PointF(points.get(i).getX(),points.get(i).getY()));
+                        }
+                        result.put(DetectFaceParts.FACE,pointFList);
+                    }
+                    {
+                        points = mlFace.getFaceShape(MLFaceShape.TYPE_TOP_OF_LEFT_EYEBROW).getPoints();
+                        List<PointF> pointFList = new ArrayList<>();
+                        for (int i = 0; i < points.size(); i++) {
+                            pointFList.add(new PointF(points.get(i).getX(),points.get(i).getY()));
+                        }
+                        points = mlFace.getFaceShape(MLFaceShape.TYPE_BOTTOM_OF_LEFT_EYEBROW).getPoints();
+
+                        for (int i = points.size()-1; i >=0; i--) {
+                            pointFList.add(new PointF(points.get(i).getX(),points.get(i).getY()));
+                        }
+
+                        result.put(DetectFaceParts.EYEBROW_LEFT,pointFList);
+
+                    }
+                    {
+                        points = mlFace.getFaceShape(MLFaceShape.TYPE_TOP_OF_RIGHT_EYEBROW).getPoints();
+                        List<PointF> pointFList = new ArrayList<>();
+                        for (int i = 0; i < points.size(); i++) {
+                            pointFList.add(new PointF(points.get(i).getX(),points.get(i).getY()));
+                        }
+                        points = mlFace.getFaceShape(MLFaceShape.TYPE_BOTTOM_OF_RIGHT_EYEBROW ).getPoints();
+                        for (int i = points.size()-1; i >=0; i--) {
+                            pointFList.add(new PointF(points.get(i).getX(),points.get(i).getY()));
+                        }
+                        result.put(DetectFaceParts.EYEBROW_RIGHT,pointFList);
+                    }
+
+                    {
+                        points = mlFace.getFaceShape(MLFaceShape.TYPE_TOP_OF_UPPER_LIP).getPoints();
+                        List<PointF> pointFList = new ArrayList<>();
+                        for (int i = 0; i < points.size(); i++) {
+                            pointFList.add(new PointF(points.get(i).getX(),points.get(i).getY()));
+                        }
+                        points = mlFace.getFaceShape(MLFaceShape.TYPE_BOTTOM_OF_LOWER_LIP).getPoints();
+                        for (int i = 0; i < points.size(); i++) {
+                            pointFList.add(new PointF(points.get(i).getX(),points.get(i).getY()));
+                        }
+                        result.put(DetectFaceParts.LIP,pointFList);
+                    }
+                    onDetectFacePartsListener.onDetectSuccess(result);
+                }
+                analyzer.destroy();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                onDetectFacePartsListener.onDetectFaceFailure();
+                analyzer.destroy();
+            }
+        });
+
     }
 
     public void clearFaceCache(){
