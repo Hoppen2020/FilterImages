@@ -8,9 +8,12 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.SparseArray;
 
+import com.blankj.utilcode.util.CacheDiskStaticUtils;
+import com.blankj.utilcode.util.CacheDiskUtils;
 import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.huawei.hms.mlsdk.common.MLFrame;
 import com.huawei.hms.mlsdk.common.MLPosition;
 import com.huawei.hms.mlsdk.face.MLFace;
@@ -68,19 +71,30 @@ public abstract class FaceFilter extends Filter{
             MLFace faceResult = null;
             MLFrame frame = MLFrame.fromBitmap(oriBitmap);
             SparseArray<MLFace> mlFaceSparseArray = analyzer.analyseFrame(frame);
-            //LogUtils.e(mlFaceSparseArray.size());
+            LogUtils.e(mlFaceSparseArray.size());
             if (mlFaceSparseArray.size()>0){
                 faceResult = mlFaceSparseArray.get(0);
                 //记录定位数据
                 String face = GsonUtils.toJson(faceResult);
+                //LogUtils.e(face);
+                CacheDiskStaticUtils.put(FilterCacheConfig.CACHE_FACE,face);
                 SPUtils.getInstance().put(FilterCacheConfig.CACHE_FACE,face);
             }else {
                 //因uv、伍氏光，无法识别人脸，保底使用上次缓存
-                faceResult = GsonUtils.fromJson(
-                        SPUtils.getInstance()
-                                .getString(FilterCacheConfig.CACHE_FACE),GsonUtils.getType(MLFace.class));
+                String cache = SPUtils.getInstance().getString(FilterCacheConfig.CACHE_FACE,"");
+//                LogUtils.e(cache);
+                if (StringUtils.isEmpty(cache)){
+//                    LogUtils.e(cache);
+                    cache = CacheDiskStaticUtils.getString(FilterCacheConfig.CACHE_FACE,"");
+                }
+                faceResult = GsonUtils.fromJson(cache,GsonUtils.getType(MLFace.class));
+//                LogUtils.e(SPUtils.getInstance().getString(FilterCacheConfig.CACHE_FACE));
+//                faceResult = GsonUtils.fromJson(
+//                        SPUtils.getInstance()
+//                                .getString(FilterCacheConfig.CACHE_FACE),GsonUtils.getType(MLFace.class));
             }
             analyzer.stop();
+            LogUtils.e("123"+(faceResult!=null));
             if (faceResult!=null){
                 mouthPoints = new ArrayList<>();
                 mouthPoints.addAll(Arrays.asList(faceResult.getFaceShape(TYPE_TOP_OF_UPPER_LIP).getCoordinatePoints()));

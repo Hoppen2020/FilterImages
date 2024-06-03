@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
       oriView = findViewById(R.id.iv_ori);
       filterView = findViewById(R.id.iv_filter);
 
-      Bitmap firstBitmap = getImageFromAssetsFile("111111.jpg");
+      Bitmap firstBitmap = getImageFromAssetsFile("a2.jpg");
 
-      Bitmap imageFromAssetsFile = getImageFromAssetsFile("111111.jpg");
+      Bitmap imageFromAssetsFile = getImageFromAssetsFile("a1.jpg");
       oriView.setImageBitmap(imageFromAssetsFile);
 
       File file = new File(Environment.getExternalStorageDirectory().getPath() + "/test");
@@ -59,13 +59,26 @@ public class MainActivity extends AppCompatActivity {
       FilterHelper filterHelper = new FilterHelper();
       try {
 
+//         filterHelper.execute(FilterType.FACE_DARK_CIRCLES, imageFromAssetsFile, 0, file.getPath() + "/2.jpg", new OnFilterListener() {
+//            @Override
+//            public void onFilter(FilterInfoResult filterInfoResult) {
+//               LogUtils.e(filterInfoResult.toString());
+//               String filterImagePath = filterInfoResult.getFilterImagePath();
+//               //LogUtils.e(filterImagePath);
+//               Bitmap bitmap = ImageUtils.getBitmap(filterImagePath);
+//               if (bitmap!=null)filterView.setImageBitmap(bitmap);
+//               filterView.setVisibility(View.VISIBLE);
+//            }
+//         });
+
+         //--------------------------------------👇这个参数 记得改
          filterHelper.detectFace(firstBitmap, true, new OnDetectFaceListener() {
             @Override
             public void onDetectSuccess(List<PointF> partPoint) {
                try {
                   LogUtils.e(partPoint.toString());
                   //"/"+new Random().nextInt(100000) +".jpg"
-                  filterHelper.execute(FilterType.FACE_WRINKLE, imageFromAssetsFile, 0, file.getPath() + "/2.jpg", new OnFilterListener() {
+                  filterHelper.execute(FilterType.FACE_DARK_CIRCLES, imageFromAssetsFile, 0, file.getPath() + "/2.jpg", new OnFilterListener() {
                      @Override
                      public void onFilter(FilterInfoResult filterInfoResult) {
                         LogUtils.e(filterInfoResult.toString());
@@ -89,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
          e.printStackTrace();
       }
 
-      Test.test();
+      //Test.test();
 
    }
 
@@ -142,7 +155,10 @@ public class MainActivity extends AppCompatActivity {
 
    }
 
+   private void detectFaceAdnExecute(){
 
+
+   }
 
    private Bitmap getImageFromAssetsFile(String fileName) {
       Bitmap image = null;

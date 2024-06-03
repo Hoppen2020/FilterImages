@@ -77,6 +77,7 @@ public class FaceDarkCircles4 extends FaceFilter {
         Mat rgbMat = new Mat();
         Imgproc.cvtColor(hsvImage, rgbMat, Imgproc.COLOR_HSV2RGB);
 
+
         Mat grayMat = new Mat();
         Imgproc.cvtColor(rgbMat,grayMat,Imgproc.COLOR_RGB2GRAY);
 
@@ -265,9 +266,14 @@ public class FaceDarkCircles4 extends FaceFilter {
                         AB = (AB > 255 ? 255 : (Math.max(AB, 0)));
 
                         if (AB<175){
-                            p[index] = (byte) resultR;
-                            p[index+1] =(byte) resultG;
-                            p[index+2] = (byte) resultB;
+
+                            int oriR = (int) ((p[index]& 0xff) *.6);
+                            int oriG = (int) ((p[index + 1]& 0xff));
+                            int oriB = (int) ((p[index + 2]& 0xff)*.9);
+
+                            p[index] = (byte) 160;//160
+                            p[index+1] =(byte) 141;//141
+                            p[index+2] = (byte) 0;//0
                             count++;
                         }
                     }
@@ -303,6 +309,20 @@ public class FaceDarkCircles4 extends FaceFilter {
         Bitmap resultBitmap = Bitmap.createBitmap(getOriginalImage().getWidth(),getOriginalImage().getHeight(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(oriMat,resultBitmap,true);
 
+       // Bitmap topBitmap = Bitmap.createBitmap(dst,width,height, Bitmap.Config.ARGB_8888);
+//        Mat top = new Mat();
+//        Utils.bitmapToMat(topBitmap,top);
+//        Mat oriMat = new Mat();
+        Mat o = new Mat();
+        Utils.bitmapToMat(getOriginalImage(),o);
+        Core.addWeighted(o,0.8,oriMat,0.2,0,o);
+        Utils.matToBitmap(o,resultBitmap);
+        o.release();
+        oriMat.release();
+
+
+
+
         Mat areaMat = new Mat();
         Utils.bitmapToMat(getFaceAreaImage(),areaMat);
         filterInfoResult.setFaceAreaInfo(createFaceAreaInfo(areaMat));
@@ -330,5 +350,8 @@ public class FaceDarkCircles4 extends FaceFilter {
         return (int) (0.299f * Color.red(color) + 0.587f * Color.green(color) + 0.114f * Color.blue(color));
     }
 
+//    private int lightenColor(int color ,double factor){
+//        return (int) Math.min(color + (255 - color) * factor, 255);
+//    }
 
 }

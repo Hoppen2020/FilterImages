@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 
 import java.io.IOException;
@@ -27,6 +28,11 @@ import co.hoppen.filter.DetectFaceParts;
 import co.hoppen.filter.FilterHelper;
 import co.hoppen.filter.OnDetectFaceListener;
 import co.hoppen.filter.OnDetectFacePartsListener;
+import co.hoppen.filter.face01.FaceZoFilterHelper;
+import co.hoppen.filter.face01.FaceZoFilterType;
+import co.hoppen.filter.face01.FilterFaceZoInfoResult;
+import co.hoppen.filter.face01.OnFaceZoFilterListener;
+import co.hoppen.filter.filter.FaceHydrationStatus;
 
 /**
  * Created by YangJianHui on 2024/4/7.
@@ -42,7 +48,7 @@ public class Face01Activity extends AppCompatActivity {
 
       ImageView filterView = findViewById(R.id.filter);
 
-      Bitmap bitmap = getImageFromAssetsFile("face_01.jpg");
+      Bitmap bitmap = getImageFromAssetsFile("face_2.jpg");
 
       findViewById(R.id.parent).setOnClickListener(new View.OnClickListener() {
          @Override
@@ -55,34 +61,18 @@ public class Face01Activity extends AppCompatActivity {
                      @Override
                      public void onDetectSuccess(Map<DetectFaceParts, List<PointF>> detectMap) {
 
-                        Paint paint = new Paint();
-                        paint.setAntiAlias(true);
-                        paint.setFilterBitmap(true);
-                        paint.setColor(Color.RED);
-
-                        Bitmap drawBitmap = bitmap.copy(bitmap.getConfig(),true);
-
-                        Canvas canvas = new Canvas(drawBitmap);
-
-
-                        for (Map.Entry<DetectFaceParts, List<PointF>> next : detectMap.entrySet()) {
-                           List<PointF> partPoint = next.getValue();
-                           Path path = new Path();
-
-                           for (int i = 0; i < partPoint.size(); i++) {
-                              PointF pointF = partPoint.get(i);
-                              paint.setStyle(Paint.Style.FILL);
-                              canvas.drawCircle(pointF.x, pointF.y, 10, paint);
-                              paint.setStyle(Paint.Style.STROKE);
-                              canvas.drawCircle(pointF.x, pointF.y, 15, paint);
-                              if (i == 0) {
-                                 path.moveTo(pointF.x, pointF.y);
-                              } else path.lineTo(pointF.x, pointF.y);
+                        new FaceZoFilterHelper().execute(FaceZoFilterType.ZO_FACE_RED_BLOCK,
+                                bitmap,
+                                100,
+                                detectMap,
+                                null,
+                                new OnFaceZoFilterListener() {
+                           @Override
+                           public void onFilterResult(FilterFaceZoInfoResult result) {
+                              LogUtils.e(result.toString());
+                              filterView.setImageBitmap(result.getFilterImage());
                            }
-                           path.close();
-                           canvas.drawPath(path, paint);
-                        }
-                        filterView.setImageBitmap(drawBitmap);
+                        });
                      }
 
                      @Override
@@ -94,7 +84,6 @@ public class Face01Activity extends AppCompatActivity {
             },1000);
          }
       });
-
    }
 
    private Bitmap getImageFromAssetsFile(String fileName) {
@@ -110,6 +99,34 @@ public class Face01Activity extends AppCompatActivity {
       return image;
    }
 
-
+//   {
+//      Paint paint = new Paint();
+//      paint.setAntiAlias(true);
+//      paint.setFilterBitmap(true);
+//      paint.setColor(Color.RED);
+//
+//      Bitmap drawBitmap = bitmap.copy(bitmap.getConfig(),true);
+//
+//      Canvas canvas = new Canvas(drawBitmap);
+//
+//
+//      for (Map.Entry<DetectFaceParts, List<PointF>> next : detectMap.entrySet()) {
+//         List<PointF> partPoint = next.getValue();
+//         Path path = new Path();
+//
+//         for (int i = 0; i < partPoint.size(); i++) {
+//            PointF pointF = partPoint.get(i);
+//            paint.setStyle(Paint.Style.FILL);
+//            canvas.drawCircle(pointF.x, pointF.y, 10, paint);
+//            paint.setStyle(Paint.Style.STROKE);
+//            canvas.drawCircle(pointF.x, pointF.y, 15, paint);
+//            if (i == 0) {
+//               path.moveTo(pointF.x, pointF.y);
+//            } else path.lineTo(pointF.x, pointF.y);
+//         }
+//         path.close();
+//         canvas.drawPath(path, paint);
+//      }
+//   }
 
 }

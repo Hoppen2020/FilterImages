@@ -89,7 +89,7 @@ public class FilterHelper {
                 if (filter instanceof FaceFilter){ //人脸算法
                     //人脸区域定位
                     boolean finish = ((FaceFilter) filter).faceAreaPositioning(createAnalyzer());
-                    //LogUtils.e(finish);
+                    LogUtils.e(finish);
                     if (finish)filter.onFilter(filterInfoResult);
                 }else { //局部算法
                     filter.onFilter(filterInfoResult);
@@ -181,6 +181,7 @@ public class FilterHelper {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(Exception e) {
+                    LogUtils.e(e.toString());
                     if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();
                 }
             });
@@ -193,6 +194,7 @@ public class FilterHelper {
 //            }
 
         } catch (Exception e) {
+            LogUtils.e(e.toString());
             if (onDetectFaceListener!=null)onDetectFaceListener.onDetectFaceFailure();
             e.printStackTrace();
         }
@@ -207,7 +209,8 @@ public class FilterHelper {
         analyzer.asyncAnalyseFrame(frame).addOnSuccessListener(new OnSuccessListener<List<MLFace>>() {
             @Override
             public void onSuccess(List<MLFace> mlFaces) {
-                if (onDetectFacePartsListener!=null&&mlFaces.size()==1){
+                LogUtils.e("onSuccess","size:"+mlFaces.size());
+                if (onDetectFacePartsListener!=null && mlFaces.size()==1){
                     MLFace mlFace = mlFaces.get(0);
                     Map<DetectFaceParts,List<PointF>> result = new HashMap<>();
                     List<MLPosition> points = mlFace.getFaceShape(MLFaceShape.TYPE_FACE).getPoints();
@@ -259,13 +262,20 @@ public class FilterHelper {
                         result.put(DetectFaceParts.LIP,pointFList);
                     }
                     onDetectFacePartsListener.onDetectSuccess(result);
+                }else {
+                    if (onDetectFacePartsListener!=null){
+                        onDetectFacePartsListener.onDetectFaceFailure();
+                    }
                 }
                 analyzer.destroy();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                onDetectFacePartsListener.onDetectFaceFailure();
+                LogUtils.e("onFailure");
+                if (onDetectFacePartsListener!=null){
+                    onDetectFacePartsListener.onDetectFaceFailure();
+                }
                 analyzer.destroy();
             }
         });

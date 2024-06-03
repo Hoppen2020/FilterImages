@@ -215,7 +215,7 @@ public class CutoutUtils {
     private static void cutoutEyeBottom(MLFace face, Canvas canvas, Paint paint) {
         RectF eyeRectF = new RectF();
         eyeRectF.left = face.getAllPoints().get(254).getX();
-        eyeRectF.top = face.getAllPoints().get(251).getY();
+        eyeRectF.top = face.getAllPoints().get(405).getY();//251
         eyeRectF.right = face.getAllPoints().get(144).getX();
         eyeRectF.bottom = face.getAllPoints().get(132).getY();
 //        canvas.drawBitmap(middle,null,eyeRectF,paint);
