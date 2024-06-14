@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
       oriView = findViewById(R.id.iv_ori);
       filterView = findViewById(R.id.iv_filter);
 
-      Bitmap firstBitmap = getImageFromAssetsFile("a2.jpg");
+      Bitmap firstBitmap = getImageFromAssetsFile("22.jpg");
 
-      Bitmap imageFromAssetsFile = getImageFromAssetsFile("a1.jpg");
+      Bitmap imageFromAssetsFile = getImageFromAssetsFile("22.jpg");
       oriView.setImageBitmap(imageFromAssetsFile);
 
       File file = new File(Environment.getExternalStorageDirectory().getPath() + "/test");
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                try {
                   LogUtils.e(partPoint.toString());
                   //"/"+new Random().nextInt(100000) +".jpg"
-                  filterHelper.execute(FilterType.FACE_DARK_CIRCLES, imageFromAssetsFile, 0, file.getPath() + "/2.jpg", new OnFilterListener() {
+                  filterHelper.execute(FilterType.FACE_RED_BLOOD, imageFromAssetsFile, 0, file.getPath() + "/2.jpg", new OnFilterListener() {
                      @Override
                      public void onFilter(FilterInfoResult filterInfoResult) {
                         LogUtils.e(filterInfoResult.toString());

@@ -14,11 +14,13 @@ import co.hoppen.filter.filter.FaceNearRedLight;
 import co.hoppen.filter.filter.FaceOilSecretion;
 import co.hoppen.filter.filter.FacePorphyrin;
 import co.hoppen.filter.filter.FaceRedBlock;
+import co.hoppen.filter.filter.FaceRedBlood2;
 import co.hoppen.filter.filter.FaceRedBlood5;
 import co.hoppen.filter.filter.FaceSkinVeins3;
 import co.hoppen.filter.filter.FaceSuperficialPlaque3;
 import co.hoppen.filter.filter.FaceTest;
 import co.hoppen.filter.filter.FaceUvSpot;
+import co.hoppen.filter.filter.FaceWrinkle;
 import co.hoppen.filter.filter.FaceWrinkle3;
 import co.hoppen.filter.filter.Filter;
 import co.hoppen.filter.filter.FollicleCleanDegree;
@@ -58,7 +60,7 @@ public enum FilterType {
     FACE_OIL_SECRETION(FaceOilSecretion.class),
     //--------------皱纹---------------------
     //全脸——皱纹
-    FACE_WRINKLE(FaceWrinkle3.class),//FaceWrinkle.class
+    FACE_WRINKLE(FaceWrinkle.class),//FaceWrinkle.class
     //全脸——皮肤纹理
     FACE_SKIN_VEINS(FaceSkinVeins3.class),
     //--------------眼圈---------------------
@@ -78,7 +80,7 @@ public enum FilterType {
     FACE_PORPHYRIN(FacePorphyrin.class),
     //--------------敏感---------------------
     //全脸——红血丝(交叉PL)×分数
-    FACE_RED_BLOOD(FaceRedBlood5.class),//FaceRedBlood2.class
+    FACE_RED_BLOOD(FaceRedBlood2.class),//FaceRedBlood2.class
     //全脸——敏感(交叉PL)
     FACE_NEAR_RED_LIGHT(FaceNearRedLight.class),
     //红色区
